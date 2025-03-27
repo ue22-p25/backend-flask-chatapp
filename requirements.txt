@@ -1,0 +1,7 @@
+flask
+flask-sqlalchemy
+requests
+
+# this is optional but super useful to interact with the database
+httpie
+flask-socketio

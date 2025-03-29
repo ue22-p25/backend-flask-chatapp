@@ -119,7 +119,7 @@ def list_users():
 # however in practice /front/users would probably be just /users
 
 # try it by pointing your browser to
-""""
+"""
 http://localhost:5001/front/users
 """
 @app.route('/front/users')

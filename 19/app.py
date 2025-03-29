@@ -238,7 +238,7 @@ def list_messages_to(recipient_id):
 # however in practice /front/users would probably be just /users
 
 # try it by pointing your browser to
-""""
+"""
 http://localhost:5001/front/users
 """
 @app.route('/front/users')
@@ -259,7 +259,7 @@ def front_users():
 
 
 # try it by pointing your browser to
-""""
+"""
 http://localhost:5001/front/messages/1
 """
 @app.route('/front/messages/<int:recipient>')

@@ -1,6 +1,6 @@
-"""
+'''
 pass current nickname to the JS code
-"""
+'''
 
 import json
 from datetime import datetime as DateTime

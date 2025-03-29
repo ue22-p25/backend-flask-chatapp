@@ -1,6 +1,6 @@
-"""
+'''
 redirect the / route to /front/users
-"""
+'''
 
 import json
 import requests

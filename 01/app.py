@@ -1,6 +1,6 @@
-"""
+'''
 add a /db/alive endpoint to check if the database is alive
-"""
+'''
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy

@@ -1,8 +1,8 @@
-"""
+'''
 /api/messages creation endpoint returns more details
 like author and recipient, and date
 see also changes in script.js
-"""
+'''
 
 import json
 from datetime import datetime as DateTime

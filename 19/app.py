@@ -1,6 +1,6 @@
-"""
+'''
 properly display incoming messages in the frontend
-"""
+'''
 
 import json
 from datetime import datetime as DateTime

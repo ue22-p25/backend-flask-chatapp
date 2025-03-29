@@ -1,6 +1,6 @@
-"""
+'''
 /api/messages/with/<user_id> returns users details
-"""
+'''
 
 import json
 from datetime import datetime as DateTime

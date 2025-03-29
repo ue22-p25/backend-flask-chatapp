@@ -24,6 +24,7 @@ EXTENSIONS = {
     '.css': { 'lang': 'css', 'comment': lambda line: f"/* {line} */"},
     '.html': { 'lang': 'html', 'comment': lambda line: f"<!-- {line} -->"},
     '.text': { 'lang': 'text', 'comment': lambda line: f"{line}"},
+    '.j2': { 'lang': 'jinja2', 'comment': lambda line: f"<!-- {line} -->"},
 }
 
 def add_lang_index():
@@ -81,6 +82,36 @@ def onefile_cat(file1, *, filename=None, lang=None, comment=None, added=True):
     print()
 
 
+class DiffWriter:
+
+    def __init__(self, comment):
+        self.comment = comment
+        self.mode = ' '  # could be '+', '-', ' ', or '@'
+        self.lines = []
+
+    def flush(self):
+        match self.mode:
+            case ' ':
+                for line in self.lines:
+                    print(line)
+            case '+' | '-':
+                if self.lines:
+                    print(self.comment(f"!diff(1:{len(self.lines)}) {self.mode}"))
+                    for line in self.lines:
+                        print(line)
+            case '@':
+                if self.lines:
+                    print(self.comment(f"!className separator"))
+                    print(30*'.')
+        self.lines = []
+
+    def add_line(self, line, mode):
+        if self.mode != mode:
+            self.flush()
+        self.mode = mode
+        self.lines.append(line)
+
+
 def onefile_diff(file1, file2, *, filename=None, lang=None, comment=None):
     """
     Compare two files and print the differences as one triple-fenced code block.
@@ -95,23 +126,32 @@ def onefile_diff(file1, file2, *, filename=None, lang=None, comment=None):
 
     lines1, lines2 = path1.read_text().splitlines(), path2.read_text().splitlines()
     print(f"```{lang} {filename}")
+    diff_writer = DiffWriter(comment)
     for line in difflib.unified_diff(lines1, lines2, str(file1), str(file2)):
         if line.startswith('---') or line.startswith('+++') or not line.strip():
             continue
         if line.startswith('@@'):
-            print(comment("!className separator"))
-            print(30*'.')
+            diff_writer.add_line(line, '@')
             continue
         start, end = line[:1], line[1:]
         if start == ' ':
-            # print the unchanged lines
-            print(end)
+            diff_writer.add_line(line[1:], ' ')
             continue
         if start in ['-', '+']:
-            print(comment(f"!diff {start}"))
-            print(end)
+            diff_writer.add_line(end, start)
+    diff_writer.flush()
     print("```")
     print()
+
+
+def files_equal(file1, file2):
+    """
+    Check if two files are equal.
+    """
+    path1, path2 = Path(file1), Path(file2)
+    if not path1.exists() or not path2.exists():
+        return False
+    return path1.read_text() == path2.read_text()
 
 
 def onedir_diff(dir1, dir2):
@@ -137,8 +177,9 @@ def onedir_diff(dir1, dir2):
     while files1 and files2:
         file1, file2 = files1[0], files2[0]
         if file1 == file2:
-            md_title(f"common file: {file1}", level=3)
-            onefile_diff(path1 / file1, path2 / file2)
+            if not files_equal(path1 / file1, path2 / file2):
+                md_title(f"changes in file: {file1}", level=3)
+                onefile_diff(path1 / file1, path2 / file2)
             files1.pop(0)
             files2.pop(0)
         elif file1 < file2:

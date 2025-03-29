@@ -15,6 +15,9 @@ from pathlib import Path
 from argparse import ArgumentParser
 import subprocess as sp
 
+import click
+
+
 EXTENSIONS = {
     '.py' : { 'lang': 'python', 'comment': lambda line: f"# {line}"},
     '.js' : { 'lang': 'js', 'comment': lambda line: f"// {line}"},
@@ -72,8 +75,8 @@ def onefile_cat(file1, *, filename=None, lang=None, comment=None, added=True):
     print(f"```{lang} {filename}")
     with path1.open() as f:
         for line in f:
-            print(comment("!diff {sign}"))
-            print(line)
+            print(comment(f"!diff {sign}"))
+            print(line, end="")
     print("```")
     print()
 
@@ -92,14 +95,21 @@ def onefile_diff(file1, file2, *, filename=None, lang=None, comment=None):
 
     lines1, lines2 = path1.read_text().splitlines(), path2.read_text().splitlines()
     print(f"```{lang} {filename}")
-    for line in difflib.ndiff(lines1, lines2):
-        start, end = line[:2], line[2:]
-        match start:
-            case '- ' | '+ ':
-                print(comment(f"!diff {start.rstrip()}"))
-                print(end)
-            case '  ':
-                print(end)
+    for line in difflib.unified_diff(lines1, lines2, str(file1), str(file2)):
+        if line.startswith('---') or line.startswith('+++') or not line.strip():
+            continue
+        if line.startswith('@@'):
+            print(comment("!className separator"))
+            print(30*'.')
+            continue
+        start, end = line[:1], line[1:]
+        if start == ' ':
+            # print the unchanged lines
+            print(end)
+            continue
+        if start in ['-', '+']:
+            print(comment(f"!diff {start}"))
+            print(end)
     print("```")
     print()
 
@@ -142,7 +152,7 @@ def onedir_diff(dir1, dir2):
             files2.pop(0)
 
 
-def dirchain(paths):
+def chaindirs(paths):
     """
     accepts a sequence of at least 2 paths
     then will run onefile_diff on each pair of successive paths
@@ -152,50 +162,39 @@ def dirchain(paths):
         onedir_diff(a, b)
 
 
-# xxx use click
+# using click to expose one command per function
 
-def onefile_cli():
-    parser = ArgumentParser(description="Compare two files and print the differences.")
-    parser.add_argument('file1', type=Path, help='First file to compare')
-    parser.add_argument('file2', type=Path, help='Second file to compare')
-    parser.add_argument('-l', '--lang', type=str, default='python', help='Language for syntax highlighting')
-    parser.add_argument('-c', '--comment', type=str, default=None, help='Comment character for the language')
-    parser.add_argument('-f', '--filename', type=str, help='Filename for the output')
+@click.group(chain=True, help=sys.modules[__name__].__doc__)
+def cli():
+    pass
 
-    args = parser.parse_args()
-
+@cli.command('diff-files', help="write out diff between two files")
+@click.option('-f', '--filename', type=str, help='Filename for the output')
+@click.option('-l', '--lang', type=str, default='python', help='Language for syntax highlighting')
+@click.option('-c', '--comment', type=str, default=None, help='Comment character for the language')
+@click.argument('file1', type=Path)
+@click.argument('file2', type=Path)
+def onefile_cli(filename, lang, comment, file1, file2):
     onefile_diff(
-        args.file1, args.file2,
-        lang=args.lang,
-        comment=args.comment,
-        filename=args.filename)
+        file1, file2, filename=filename, lang=lang, comment=comment,
+    )
 
 
-def onedir_cli():
-    parser = ArgumentParser(description="Compare two directories and print the differences.")
-    parser.add_argument('dir1', type=Path, help='First directory to compare')
-    parser.add_argument('dir2', type=Path, help='Second directory to compare')
-
-    args = parser.parse_args()
-
-    onedir_diff(args.dir1, args.dir2)
+@cli.command('diff-dirs', help="write out diff between two directories")
+@click.argument('dir1', type=Path)
+@click.argument('dir2', type=Path)
+def onedir_cli(dir1, dir2):
+    onedir_diff(dir1, dir2)
 
 
-def dirchain_cli():
-    parser = ArgumentParser(description="Compare two directories and print the differences.")
-    parser.add_argument('dirs', type=Path, nargs='+', help='Directories to compare')
-    args = parser.parse_args()
-
-    if len(args.dirs) < 2:
+@cli.command('chain-dirs', help="write out diff between a succession of directories")
+@click.argument('dirs', type=Path, nargs=-1)
+def chaindirs_cli(dirs):
+    if len(dirs) < 2:
         print("At least two directories are required for comparison.")
         return
 
-    dirchain(args.dirs)
-
-
-def main():
-    dirchain_cli()
-
+    chaindirs(dirs)
 
 if __name__ == "__main__":
-    main()
+    cli()

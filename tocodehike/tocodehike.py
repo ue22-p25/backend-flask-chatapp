@@ -60,28 +60,6 @@ def defaults(path, filename, lang, comment):
     return filename, lang, comment
 
 
-def onefile_cat(file1, *, filename=None, lang=None, comment=None, added=True):
-    """
-    Print the contents of a file as a triple-fenced code block.
-    if added is True, print the added lines with a green + sign
-    otherwise use a red - sign
-    """
-    path1 = Path(file1)
-    if not path1.exists():
-        print(f"File {path1} does not exist.", sys.stderr)
-        return
-    # assign from args or compute defaults
-    filename, lang, comment = defaults(path1, filename, lang, comment)
-    sign = '+' if added else '-'
-    print(f"```{lang} {filename}")
-    with path1.open() as f:
-        for line in f:
-            print(comment(f"!diff {sign}"))
-            print(line, end="")
-    print("```")
-    print()
-
-
 class DiffWriter:
 
     def __init__(self, comment):
@@ -110,6 +88,30 @@ class DiffWriter:
             self.flush()
         self.mode = mode
         self.lines.append(line)
+
+
+def onefile_cat(file1, *, filename=None, lang=None, comment=None, added=True):
+    """
+    Print the contents of a file as a triple-fenced code block.
+    if added is True, print the added lines with a green + sign
+    otherwise use a red - sign
+    """
+    path1 = Path(file1)
+    if not path1.exists():
+        print(f"File {path1} does not exist.", sys.stderr)
+        return
+    # assign from args or compute defaults
+    filename, lang, comment = defaults(path1, filename, lang, comment)
+    sign = '+' if added else '-'
+    diff_writer = DiffWriter(comment)
+    print(f"```{lang} {filename}")
+    with path1.open() as f:
+        for line in f:
+            line = line.rstrip()
+            diff_writer.add_line(line, sign)
+    diff_writer.flush()
+    print("```")
+    print()
 
 
 def onefile_diff(file1, file2, *, filename=None, lang=None, comment=None):

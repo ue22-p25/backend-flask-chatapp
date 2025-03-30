@@ -1,6 +1,5 @@
 '''
 /front/messages/<user_id> has a dialog to send messages
-see also differences in messages.html.j2
 '''
 
 VERSION = "13"

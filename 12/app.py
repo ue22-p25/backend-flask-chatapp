@@ -1,6 +1,5 @@
 """
 /front/messages/<user_id> builds a html page to see messages
-see also new template templates/messages.html.j2
 """
 
 VERSION = "12"

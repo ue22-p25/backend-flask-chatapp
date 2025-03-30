@@ -90,6 +90,7 @@ def version():
 """
 http :5001/api/users name="Alice Caroll" email="alice@foo.com" nickname="alice"
 http :5001/api/users name="Bob Morane" email="bob@foo.com" nickname="bob"
+http :5001/api/users name="Charlie Chaplin" email="charlie@foo.com" nickname="charlie"
 """
 @app.route('/api/users', methods=['POST'])
 def create_user():
@@ -145,6 +146,7 @@ http :5001/api/messages author_id=1 recipient_id=2 content="paillasson"
 http :5001/api/messages author_id=2 recipient_id=1 content="somnambule"
 http :5001/api/messages author_id=1 recipient_id=2 content="bulletin"
 http :5001/api/messages author_id=2 recipient_id=1 content="tintamarre"
+http :5001/api/messages author_id=2 recipient_id=3 content="not visible by 1"
 """
 @app.route('/api/messages', methods=['POST'])
 def create_message():

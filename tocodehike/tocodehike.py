@@ -173,24 +173,25 @@ def onedir_diff(dir1, dir2):
 
     md_title(f"changes from {path1} to {path2}")
 
-    file1 = file2 = None
-    while files1 and files2:
-        file1, file2 = files1[0], files2[0]
-        if file1 == file2:
-            if not files_equal(path1 / file1, path2 / file2):
-                md_title(f"changes in file: {file1}", level=3)
-                onefile_diff(path1 / file1, path2 / file2)
-            files1.pop(0)
-            files2.pop(0)
-        elif file1 < file2:
-            md_title(f"deleted file: {file1}", level=3)
-            # on second thought, no need to show the old file if it gets deleted
-            # onefile_cat(path1 / file1, added=False)
-            files1.pop(0)
-        else:
-            md_title(f"new file: {file2}", level=3)
-            onefile_cat(path2 / file2, added=True)
-            files2.pop(0)
+    same_files =  sorted(set(files1) & set(files2))
+    new_files = sorted(set(files2) - set(files1))
+    deleted_files = sorted(set(files1) - set(files2))
+
+    for file1 in deleted_files:
+        print(f"deleted file: {file1}", file=sys.stderr)
+        md_title(f"deleted file: {file1}", level=3)
+
+    for file in same_files:
+        # if the files are equal, we don't need to show them
+        if not files_equal(path1 / file, path2 / file):
+            print(f"changes in file: {file}", file=sys.stderr)
+            md_title(f"changes in file: {file}", level=3)
+            onefile_diff(path1 / file, path2 / file)
+
+    for file2 in new_files:
+        print(f"new file: {file2}", file=sys.stderr)
+        md_title(f"new file: {file2}", level=3)
+        onefile_cat(path2 / file2, added=True)
 
 
 def chaindirs(paths):
@@ -199,7 +200,7 @@ def chaindirs(paths):
     then will run onefile_diff on each pair of successive paths
     """
     for a, b in zip(paths, paths[1:]):
-        print(f"comparing {a} and {b}", file=sys.stderr)
+        print(f"==== comparing {a} and {b}", file=sys.stderr)
         onedir_diff(a, b)
 
 

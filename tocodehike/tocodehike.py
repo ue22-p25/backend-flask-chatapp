@@ -24,7 +24,9 @@ EXTENSIONS = {
     '.css': { 'lang': 'css', 'comment': lambda line: f"/* {line} */"},
     '.html': { 'lang': 'html', 'comment': lambda line: f"<!-- {line} -->"},
     '.text': { 'lang': 'text', 'comment': lambda line: f"{line}"},
-    '.j2': { 'lang': 'jinja2', 'comment': lambda line: f"<!-- {line} -->"},
+    # quick and dirty - need only for html at this point
+    # xxx should probably need to support e.g. .html/j2 and .js.j2
+    '.j2': { 'lang': 'html', 'comment': lambda line: f"<!-- {line} -->"},
 }
 
 def add_lang_index():

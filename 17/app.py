@@ -1,5 +1,6 @@
 '''
 pass current nickname to the JS code
+use it to subscribe to that SocketIO channel
 '''
 
 VERSION = "17"

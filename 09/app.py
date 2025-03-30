@@ -2,6 +2,8 @@
 new GET /api/messages/with/<user_id> endpoint - first draft
 '''
 
+VERSION = "09"
+
 import json
 from datetime import datetime as DateTime
 import requests
@@ -13,8 +15,6 @@ from flask import redirect
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-
-VERSION = "09"
 
 ## usual Flask initilization
 app = Flask(__name__)

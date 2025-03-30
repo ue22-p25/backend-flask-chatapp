@@ -2,6 +2,8 @@
 new POST endpoint /api/messages to create a message
 '''
 
+VERSION = "07"
+
 import json
 from datetime import datetime as DateTime
 import requests
@@ -13,8 +15,6 @@ from flask import redirect
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-
-VERSION = "07"
 
 ## usual Flask initilization
 app = Flask(__name__)

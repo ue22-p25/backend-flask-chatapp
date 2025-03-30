@@ -2,9 +2,9 @@
 the simplest possible hello world app
 """
 
-from flask import Flask
-
 VERSION = "00"
+
+from flask import Flask
 
 ## usual Flask initilization
 app = Flask(__name__)

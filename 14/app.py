@@ -3,6 +3,8 @@
 see also differences in script.js
 """
 
+VERSION = "14"
+
 import json
 from datetime import datetime as DateTime
 import requests
@@ -15,8 +17,6 @@ from flask import redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
 from sqlalchemy.sql import or_
-
-VERSION = "14"
 
 ## usual Flask initilization
 app = Flask(__name__)

@@ -2,11 +2,11 @@
 add a /db/alive endpoint to check if the database is alive
 '''
 
+VERSION = "01"
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-
-VERSION = "01"
 
 ## usual Flask initilization
 app = Flask(__name__)

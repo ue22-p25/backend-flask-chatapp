@@ -5,6 +5,8 @@ this comes with new files:
 - static/style.css
 """
 
+VERSION = "04"
+
 import json
 import requests
 
@@ -14,8 +16,6 @@ from flask import render_template
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-
-VERSION = "04"
 
 ## usual Flask initilization
 app = Flask(__name__)

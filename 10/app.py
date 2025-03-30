@@ -2,6 +2,8 @@
 /api/messages/with/<user_id> returns both from and to user
 """
 
+VERSION = "10"
+
 import json
 from datetime import datetime as DateTime
 import requests
@@ -14,8 +16,6 @@ from flask import redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
 from sqlalchemy.sql import or_
-
-VERSION = "10"
 
 ## usual Flask initilization
 app = Flask(__name__)

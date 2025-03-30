@@ -2,6 +2,8 @@
 add a /api/users GET endpoint to list users
 '''
 
+VERSION = "03"
+
 import json
 
 from flask import Flask
@@ -9,8 +11,6 @@ from flask import request
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-
-VERSION = "03"
 
 ## usual Flask initilization
 app = Flask(__name__)

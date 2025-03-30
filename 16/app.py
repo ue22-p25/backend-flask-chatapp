@@ -2,6 +2,8 @@
 app.py enables SocketIO & the front (HTML) messages page connects to the socket
 """
 
+VERSION = "16"
+
 import json
 from datetime import datetime as DateTime
 import requests
@@ -15,8 +17,6 @@ from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
 from sqlalchemy.sql import or_
-
-VERSION = "16"
 
 ## usual Flask initilization
 app = Flask(__name__)

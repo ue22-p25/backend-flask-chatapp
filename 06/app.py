@@ -2,6 +2,8 @@
 new GET endpoint /api/users/<user_id> to retrieve a single user
 """
 
+VERSION = "06"
+
 import json
 import requests
 
@@ -12,8 +14,6 @@ from flask import redirect
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-
-VERSION = "06"
 
 ## usual Flask initilization
 app = Flask(__name__)

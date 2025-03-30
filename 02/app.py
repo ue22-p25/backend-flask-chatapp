@@ -2,13 +2,13 @@
 add a /api/users POST endpoint to create a user
 """
 
+VERSION = "02"
+
 from flask import Flask
 from flask import request
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-
-VERSION = "02"
 
 ## usual Flask initilization
 app = Flask(__name__)

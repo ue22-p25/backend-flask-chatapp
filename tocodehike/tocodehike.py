@@ -169,12 +169,16 @@ def onedir_diff(dir1, dir2):
         if not path.exists():
             print(f"Directory {path} does not exist.", sys.stderr)
             return
+    d1, d2 = path1.name, path2.name
     # consider only files under git
     sp1 = sp.run(['git', 'ls-files'], cwd=path1, capture_output=True)
     files1 = sorted(set(sp1.stdout.decode().splitlines()))
     sp2 = sp.run(['git', 'ls-files'], cwd=path2, capture_output=True)
     files2 = sorted(set(sp2.stdout.decode().splitlines()))
 
+    # ignore README.md in the list of files
+    files1 = [f for f in files1 if 'README.md' not in f]
+    files2 = [f for f in files2 if 'README.md' not in f]
 
     # do we have a readme in the target dir?
     readme = path2 / 'README.md'
@@ -192,18 +196,18 @@ def onedir_diff(dir1, dir2):
 
     for file1 in deleted_files:
         print(f"deleted file: {file1}", file=sys.stderr)
-        md_title(f"deleted file: {file1}", level=3)
+        md_title(f"in {d2} - deleted file: {file1}", level=3)
 
     for file in same_files:
         # if the files are equal, we don't need to show them
         if not files_equal(path1 / file, path2 / file):
             print(f"changes in file: {file}", file=sys.stderr)
-            md_title(f"changes in file: {file}", level=3)
+            md_title(f"{d1} -> {d2} - changes in file: {file}", level=3)
             onefile_diff(path1 / file, path2 / file)
 
     for file2 in new_files:
         print(f"new file: {file2}", file=sys.stderr)
-        md_title(f"new file: {file2}", level=3)
+        md_title(f"in {d2} - new file: {file2}", level=3)
         onefile_cat(path2 / file2, added=True)
 
 

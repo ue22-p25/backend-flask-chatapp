@@ -1,5 +1,7 @@
 ## step 01: use a SQL database
 
+Let's start with empowering our Flask app with a SQL database.
+
 A lot is going on here:
 
 ### globals
@@ -16,6 +18,9 @@ A lot is going on here:
   steps)
 
 ### to try it out
+
+in all the rest we assume you run the Flask server on port 5001  
+the code will often contain the hhtp(ie) sentence to use to try the endpoint
 
 ```
 http ://localhost:5000/db/alive

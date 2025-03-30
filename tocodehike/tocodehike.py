@@ -175,7 +175,16 @@ def onedir_diff(dir1, dir2):
     sp2 = sp.run(['git', 'ls-files'], cwd=path2, capture_output=True)
     files2 = sorted(set(sp2.stdout.decode().splitlines()))
 
-    md_title(f"changes from {path1} to {path2}")
+
+    # do we have a readme in the target dir?
+    readme = path2 / 'README.md'
+    if readme.exists():
+        with readme.open() as f:
+            for line in f:
+                print(line, end="")
+    else:
+        md_title(f"changes from {path1} to {path2}")
+        print(f"no README.md in {path2}", file=sys.stderr)
 
     same_files =  sorted(set(files1) & set(files2))
     new_files = sorted(set(files2) - set(files1))

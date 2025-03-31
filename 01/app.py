@@ -1,5 +1,8 @@
 '''
+connect to a SQL (sqlite) database
+use SQLAlchemy to do so
 add a /db/alive endpoint to check if the database is alive
+add a /api/version endpoint to check the app version
 '''
 
 VERSION = "01"

@@ -17,6 +17,10 @@ A lot is going on here:
   the code (we will increment the global `VERSION` variable as we go along the
   steps)
 
+*Note* while we're talking versions, note that in a production environment, the
+API endpoints would rather be versioned like `/api/v1/...`  
+so that one can define a breaking change in the API, and still support the previous one
+
 ### to try it out
 
 in all the rest we assume you run the Flask server on port 5001  

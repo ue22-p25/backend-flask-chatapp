@@ -22,7 +22,7 @@ A lot is going on here:
 in all the rest we assume you run the Flask server on port 5001  
 the code will often contain the hhtp(ie) sentence to use to try the endpoint
 
-```
+```bash
 http ://localhost:5000/db/alive
 http ://localhost:5000/api/version
 ```

@@ -26,7 +26,7 @@ and Flask would automatically try to convert them to JSON, and fail miserably...
 this is the reason why we need to re-create a regular Python dictionary (with obviously the same keys as the
 `User` class)
 
-**Note** There are ways to deal with this a nit more concisely, but for
+**Note** There are ways to deal with this a bit more concisely, but for
 educational purposes, and  for the sake of clarity, we will stick to this
 admittedly rather tedious way of doing things
 

@@ -4,7 +4,7 @@ more useful now, we need an API endpoint to retrieve messages for a given user
 like always we will refer to the user **by its primary key**, so that is the
 expected parameter in the URL
 
-in other words, /api/messages/1 will return all messages for the user with id 1
+in other words, /api/messages/with/1 will return all messages for the user with id 1
 
 ### a first implementation
 

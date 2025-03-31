@@ -2,4 +2,4 @@
 
 super straightforward step, just retrieve all messages
 
-not vey useful actually, but if only for completeness...
+not very useful actually, but only for completeness.

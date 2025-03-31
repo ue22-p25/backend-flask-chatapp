@@ -15,8 +15,8 @@ And we also add a dedicated endpoint `/front/users` that will serve this page; t
 
 1. you direct your browser to `http://localhost:5001/front/users`
 1. which will call the `/api/users` endpoint
-1. which in turn will retrieve all users
-1. and pass that list to the Jinja2 template
+1. which in turn will retrieve all users from the DB
+1. and pass that list to the new **Jinja2 template** (the .j2 file)
 1. that will create one custom HTML element per user
 1. and return the full HTML page - with all users - back to the browser
 
@@ -31,7 +31,7 @@ We need:
 
 the basics for Jinja2 templating is:
 
-- you compute one or several variables on the Python side - here we have `users` and `VERSION`
+- you compute one or several variables on the Python side - here e.g. we have `users` and `VERSION`
 - you pass them to the template with `render_template()`
   ```python
   render_template('users.html.j2', users=users, version=VERSION)

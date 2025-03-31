@@ -67,3 +67,7 @@ we want to be able to **deploy it in more distributed way**, with the services f
 - and the `/api/` endpoints
 
 all running in different containers/computers
+
+Also note that this way of doing things is SSR (Server-Side rendering); relying
+on the API to implement this endpointmakes it more likely for us move to CSR
+(Client-Side rendering) in the future if need be.

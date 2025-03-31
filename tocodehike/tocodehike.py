@@ -17,6 +17,9 @@ import subprocess as sp
 
 import click
 
+# when generating for scrolly coding, the output syntax is a little different
+SCROLLY = False
+
 
 EXTENSIONS = {
     '.py' : { 'lang': 'python', 'comment': lambda line: f"# {line}"},
@@ -39,11 +42,16 @@ def add_lang_index():
 add_lang_index()
 
 
-def md_title(title, level=2):
+def md_title(title, *, level=2, first_changed_file=False):
     """
     output a markdown title.
     """
-    print(f"{level*'#'} {title}\n")
+    if not SCROLLY:
+        print(f"{level*'#'} {title}\n")
+    elif not first_changed_file:
+        print(f"## !!steps {title}\n")
+    else:
+        print(f"{level*'#'} {title}\n")
 
 
 def defaults(path, filename, lang, comment):
@@ -106,7 +114,10 @@ def onefile_cat(file1, *, filename=None, lang=None, comment=None, added=True):
     filename, lang, comment = defaults(path1, filename, lang, comment)
     sign = '+' if added else '-'
     diff_writer = DiffWriter(comment)
-    print(f"```{lang} {filename}")
+    if not SCROLLY:
+        print(f"```{lang} {filename}")
+    else:
+        print(f"```{lang} ! {filename}")
     with path1.open() as f:
         for line in f:
             line = line.rstrip()
@@ -129,7 +140,10 @@ def onefile_diff(file1, file2, *, filename=None, lang=None, comment=None):
     filename, lang, comment = defaults(path1, filename, lang, comment)
 
     lines1, lines2 = path1.read_text().splitlines(), path2.read_text().splitlines()
-    print(f"```{lang} {filename}")
+    if not SCROLLY:
+        print(f"```{lang} {filename}")
+    else:
+        print(f"```{lang} ! {filename}")
     diff_writer = DiffWriter(comment)
     for line in difflib.unified_diff(lines1, lines2, str(file1), str(file2)):
         if line.startswith('---') or line.startswith('+++') or not line.strip():
@@ -185,31 +199,46 @@ def onedir_diff(dir1, dir2):
     if readme.exists():
         with readme.open() as f:
             for line in f:
+                # need to tweak level 2 titles in scrolly mode
+                if SCROLLY and line.startswith('## '):
+                    line = line.replace('## ', '## !!steps ')
                 print(line, end="")
+            if not line.endswith('\n'):
+                print()
+
     else:
         md_title(f"changes from {path1} to {path2}")
-        print(f"no README.md in {path2}", file=sys.stderr)
+        print(f"WARNING: no README.md in {path2}", file=sys.stderr)
 
     same_files =  sorted(set(files1) & set(files2))
     new_files = sorted(set(files2) - set(files1))
     deleted_files = sorted(set(files1) - set(files2))
 
+    # a bit awkward: each changed file results in a new subsection
+    # except that in scrolly mode, we need a strict one-to-one mapping between
+    # subsections and code content
+    # so, the first changed file is used as the code for the readme text
+    # meaning, we need to treat the first changed file differently
+    first_changed_file = True
+
     for file1 in deleted_files:
         print(f"deleted file: {file1}", file=sys.stderr)
-        md_title(f"in {d2} - deleted file: {file1}", level=3)
+        # ignore such cases for now, might mess with the scrolly logic
+        # md_title(f"in {d2} - deleted file: {file1}", level=3)
 
     for file in same_files:
         # if the files are equal, we don't need to show them
         if not files_equal(path1 / file, path2 / file):
             print(f"changes in file: {file}", file=sys.stderr)
-            md_title(f"{d1} -> {d2} - changes in file: {file}", level=3)
+            md_title(f"{d1} -> {d2} - changes in file: {file}", level=3, first_changed_file=first_changed_file)
             onefile_diff(path1 / file, path2 / file)
+            first_changed_file = False
 
     for file2 in new_files:
         print(f"new file: {file2}", file=sys.stderr)
-        md_title(f"in {d2} - new file: {file2}", level=3)
+        md_title(f"in {d2} - new file: {file2}", level=3, first_changed_file=first_changed_file)
         onefile_cat(path2 / file2, added=True)
-
+        first_changed_file = False
 
 def chaindirs(paths):
     """
@@ -247,11 +276,14 @@ def onedir_cli(dir1, dir2):
 
 
 @cli.command('chain-dirs', help="write out diff between a succession of directories")
+@click.option('-s', '--scrolly', is_flag=True, help='Use scrolly mode')
 @click.argument('dirs', type=Path, nargs=-1)
-def chaindirs_cli(dirs):
+def chaindirs_cli(scrolly, dirs):
     if len(dirs) < 2:
         print("At least two directories are required for comparison.")
         return
+    global SCROLLY
+    SCROLLY = scrolly
 
     chaindirs(dirs)
 

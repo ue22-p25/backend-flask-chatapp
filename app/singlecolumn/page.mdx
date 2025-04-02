@@ -833,16 +833,18 @@ list-users
 ```python app.py
 # !className separator
 ..............................
-# !diff(1:3) -
+# !diff(1:4) -
 '''
 create a table for messages
 '''
-# !diff(1:3) +
+VERSION = "07"
+# !diff(1:4) +
 ''''
 new POST endpoint /api/messages to create a message
 ''''
-VERSION = "07"
+VERSION = "07b"
 import json
+from datetime import datetime as DateTime
 # !className separator
 ..............................
         return dict(error=f"{type(exc)}: {exc}"), 422
@@ -878,7 +880,7 @@ def create_message():
 # for clarity we define our routes in the /front namespace
 ```
 
-## step 08: retrieve messages
+## step 08: an endpoint to retrieve messages
 
 super straightforward step, just retrieve all messages
 
@@ -892,7 +894,7 @@ not very useful actually, but only for completeness.
 ''''
 new POST endpoint /api/messages to create a message
 ''''
-VERSION = "07"
+VERSION = "07b"
 # !diff(1:4) +
 """
 new GET /api/messages/ to retrieve all messages
@@ -931,8 +933,11 @@ in other words, /api/messages/with/1 will return all messages for the user with 
 
 ### a first implementation
 
-in this first naive approach, we return messages **with only user ids** (i.e. without their nickname)  
-also we will only return messages where the user is the **recipient**  
+in this first naive approach:
+
+- we return messages **with only user ids** (i.e. without their nickname)  
+- also we will only return messages where the user is the **recipient**  
+
 this is not very useful, but again it will help us understand how to properly deal with relationships
 
 ### nothing out of the ordinary
@@ -976,10 +981,10 @@ http :5001/api/messages/with/1
 """
 @app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
 def list_messages_to(recipient_id):
-    """
+    """"
     returns only the messages to a given person
     a first naive approach is to filter all messages by recipient_id
-    """
+    """"
     messages = Message.query.filter_by(recipient_id=recipient_id).all()
     return [
         # rebuild dict (JSON-able) objects from the SQLAlchemy objects
@@ -1027,20 +1032,21 @@ from sqlalchemy.sql import or_
 app = Flask(__name__)
 # !className separator
 ..............................
+"""
 @app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
 def list_messages_to(recipient_id):
-    """
-# !diff(1:2) -
+# !diff(1:5) -
+    """"
     returns only the messages to a given person
     a first naive approach is to filter all messages by recipient_id
-# !diff(1:3) +
+    """"
+    messages = Message.query.filter_by(recipient_id=recipient_id).all()
+# !diff(1:11) +
+    """
     returns only messages to and from a given person
     need to write a little more elaborate query
     we still can only return author_id and recipient_id
     """
-# !diff(1:1) -
-    messages = Message.query.filter_by(recipient_id=recipient_id).all()
-# !diff(1:6) +
     messages = Message.query.filter(
         or_(
             Message.author_id==recipient_id,

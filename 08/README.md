@@ -1,4 +1,4 @@
-## step 08: retrieve messages
+## step 08: an endpoint to retrieve messages
 
 super straightforward step, just retrieve all messages
 

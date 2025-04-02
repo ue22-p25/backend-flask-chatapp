@@ -8,8 +8,11 @@ in other words, /api/messages/with/1 will return all messages for the user with 
 
 ### a first implementation
 
-in this first naive approach, we return messages **with only user ids** (i.e. without their nickname)  
-also we will only return messages where the user is the **recipient**  
+in this first naive approach:
+
+- we return messages **with only user ids** (i.e. without their nickname)  
+- also we will only return messages where the user is the **recipient**  
+
 this is not very useful, but again it will help us understand how to properly deal with relationships
 
 ### nothing out of the ordinary

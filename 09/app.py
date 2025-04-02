@@ -183,10 +183,10 @@ http :5001/api/messages/with/1
 """
 @app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
 def list_messages_to(recipient_id):
-    """
+    """"
     returns only the messages to a given person
     a first naive approach is to filter all messages by recipient_id
-    """
+    """"
     messages = Message.query.filter_by(recipient_id=recipient_id).all()
     return [
         # rebuild dict (JSON-able) objects from the SQLAlchemy objects

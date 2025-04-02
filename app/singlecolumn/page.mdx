@@ -1,0 +1,1998 @@
+# Chat App step by step (single column)
+
+- [Back to top](/)
+
+## step 00: the starter code
+
+the starter code in step 00 is the basic Flask `hello world` app
+
+```python app.py
+!from ../app-00.py
+```
+
+## step 01: use a SQL database
+
+Let's start with empowering our Flask app with a SQL database.
+
+This is only boilerplate code, but it's central to the rest of the steps.
+
+### globals
+
+- We import SQLAlchemy, that provides a full SQL toolkit and Object Relational Mapper (ORM) for Python.
+- We configure Flask to use the DB located at `sqlite:///chat.db`
+- We create a new database object, and its `session` attribute, that will allow us to interact with said DB
+### 00 -> 01 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+"""
+the simplest possible hello world app
+"""
+VERSION = "00"
+# !diff(1:5) +
+'''
+connect to a SQL (sqlite) database
+use SQLAlchemy to do so
+'''
+VERSION = "01"
+from flask import Flask
+# !diff(1:2) +
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import text
+## usual Flask initilization
+app = Flask(__name__)
+# !diff(1:11) +
+
+## DB declaration
+
+# filename where to store stuff (sqlite is file-based)
+db_name = 'chat.db'
+# how do we connect to the database ?
+# here we say it's by looking in a file named chat.db
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name
+# this variable, db, will be used for all SQLAlchemy commands
+db = SQLAlchemy(app)
+
+@app.route('/')
+def hello_world():
+    return f'hello, this is a chat app! (version {VERSION})'
+# !diff(1:1) +
+
+if __name__ == '__main__':
+    app.run()
+```
+
+## step 01b: first endpoint
+
+### endpoints
+
+- We create a new endpoint `/db/alive` that will return a 200 OK response if the DB is alive
+
+This triggers the minimal SQL code, just to make sure we can reach the DB; think of it as a "Hello world" for the DB
+
+### to try it out
+
+in all the rest we assume you run the Flask server on port 5001  
+
+```bash
+http ://localhost:5000/db/alive
+```
+
+### Note for windows users
+
+It seems that the `http` command, when run on "Git Bash" for Windows, triggers an error:
+
+> Request body (from stdin, –raw or a file) and request data (key=value) cannot be mixed. Pass –ignore-stdin to let key/value take priority
+
+In that case, take the message at face value, and add the `-I` (shorthand for `--ignore-stdin`) option to the command:
+
+```bash
+http -I ://localhost:5000/db/alive
+```
+
+**Tip**: to continue using the same sentence (i.e. without the `-I`), you might be able to trick bash and define an alias
+
+```bash
+alias http='\http -I'
+```
+### 01 -> 01b - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:5) -
+'''
+connect to a SQL (sqlite) database
+use SQLAlchemy to do so
+'''
+VERSION = "01"
+# !diff(1:4) +
+"""
+add a /db/alive endpoint to check if the database is alive
+"""
+VERSION = "01b"
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+# !className separator
+..............................
+    return f'hello, this is a chat app! (version {VERSION})'
+# !diff(1:17) +
+# try it with
+"""
+http :5001/db/alive
+"""
+@app.route('/db/alive')
+def db_alive():
+    try:
+        result = db.session.execute(text('SELECT 1'))
+        print(result)
+        return dict(status="healthy", message="Database connection is alive")
+    except Exception as e:
+        # e holds description of the error
+        error_text = "<p>The error:<br>" + str(e) + "</p>"
+        hed = '<h1>Something is broken.</h1>'
+        return hed + error_text
+
+
+if __name__ == '__main__':
+    app.run()
+```
+
+## step 01c: a /api/version endpoint
+
+### endpoints
+
+- We create a new endpoint `/api/version` that will return the version of
+  the code (we will increment the global `VERSION` variable as we go along the
+  steps)
+
+*Note* while we're talking versions, note that in a production environment, the
+API endpoints would rather be versioned like `/api/v1/...`  
+so that one can define a breaking change in the API, and still support the previous one
+
+### to try it out
+
+```bash
+http ://localhost:5000/api/version
+```
+### 01b -> 01c - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+"""
+add a /db/alive endpoint to check if the database is alive
+"""
+VERSION = "01b"
+# !diff(1:4) +
+'''
+add a /api/version endpoint to check the app version
+'''
+VERSION = "01c"
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+# !className separator
+..............................
+        return hed + error_text
+# !diff(1:9) +
+# try it with
+"""
+http :5001/api/version
+"""
+@app.route('/api/version')
+def version():
+    return dict(version=VERSION)
+
+
+if __name__ == '__main__':
+    app.run()
+```
+
+## step 02: define a table in the DB
+
+### the `User` table
+
+thanks to SQLAlchemy, and specifically its ORM (Object Relational Mapper), we
+can define a table in the database **as a Python class**.
+
+- the class must inherit `db.Model`, which is the base class for all models in
+  that database
+- also, it contains a primary key - this is standard practice in SQL databases
+- it also contains as many columns as we need to model a user, in our case
+  `name`, `email` and `nickname`
+- note how each column is defined with `db.Column()`, and thus typed (here we
+  mostly have strings, but the primary key is an integer)
+
+### database actual creation
+
+note **the call to `db.create_all()`** as the first instruction executed in the
+server life cycle.
+
+**this is crucial** if we want to actually create the table (in DB words, this
+  means we apply the schema to the database)
+
+### 01c -> 02 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+'''
+add a /api/version endpoint to check the app version
+'''
+VERSION = "01c"
+# !diff(1:4) +
+""""
+create a table in the DB
+""""
+VERSION = "02b"
+from flask import Flask
+# !diff(1:2) +
+from flask import request
+
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import text
+# !className separator
+..............................
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name
+# this variable, db, will be used for all SQLAlchemy commands
+db = SQLAlchemy(app)
+# !diff(1:15) +
+
+
+## define a table in the database
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    email = db.Column(db.String)
+    nickname = db.Column(db.String)
+
+
+# actually create the database (i.e. tables etc)
+with app.app_context():
+    db.create_all()
+@app.route('/')
+```
+
+## step 02b: an endpoint to POST a new user
+
+### rows creation
+
+Look at the code for the new `/api/users` endpoint; it is totally idiomatic of
+how to use SQLAlchemy to create a new row in the database:
+
+- you **create** a `User` object, passing the values for each column
+- you than **add** it to the session
+- and finally you **commit** the session to the database (this is the actual
+  writing to the DB)
+
+(does the `add` / `commit` thing ring any bell ?)
+
+### to try it out
+
+here again see the inline comments in the code for how to trigger the new endpoint
+### 02 -> 02b - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+""""
+create a table in the DB
+""""
+VERSION = "02b"
+# !diff(1:4) +
+"""
+add a /api/users POST endpoint to create a user
+"""
+VERSION = "02"
+from flask import Flask
+from flask import request
+# !className separator
+..............................
+    return dict(version=VERSION)
+# !diff(1:24) +
+# try it with
+"""
+http :5001/api/users name="Alice Caroll" email="alice@foo.com" nickname="alice"
+http :5001/api/users name="Bob Morane" email="bob@foo.com" nickname="bob"
+"""
+@app.route('/api/users', methods=['POST'])
+def create_user():
+    # we expect the user to send a JSON object
+    # with the 3 fields name email and nickname
+    try:
+        parameters = json.loads(request.data)
+        name = parameters['name']
+        email = parameters['email']
+        nickname = parameters['nickname']
+        print("received request to create user", name, email, nickname)
+        # temporary
+        new_user = User(name=name, email=email, nickname=nickname)
+        db.session.add(new_user)
+        db.session.commit()
+        return parameters
+    except Exception as exc:
+        return dict(error=f"{type(exc)}: {exc}"), 422
+
+
+if __name__ == '__main__':
+    app.run()
+```
+
+## step 03: an endpoint to GET all users
+
+this is rather straightforward; now that we have a means to create users, we
+need a way to get them back
+
+- we use the same `/api/users` endpoint
+- except that this time we use the `GET` method
+
+### how to retrive stuff with SQLAlchemy
+
+on a SQLAlchemy class - here `User` - and specifically on its `query` attribute, we can use methods like
+
+- `all()` to get all the rows
+- `first()` to get the first row
+- `get()` to get a row by its primary key
+- `filter_by()` to filter the rows
+- and other similar words...
+
+in this case a call to `all()` will return an **iterable of `User` objects**
+
+now, we cannot unfortunately return a list of these objets as-is in the Flask route function
+
+why is that ? because these `User` objects are not JSON serializable !  
+and Flask would automatically try to convert them to JSON, and fail miserably...
+
+this is the reason why we need to re-create a regular Python dictionary (with obviously the same keys as the
+`User` class)
+
+**Note** There are ways to deal with this a bit more concisely, but for
+educational purposes, and  for the sake of clarity, we will stick to this
+admittedly rather tedious way of doing things
+
+### to try it out
+
+you know what to do
+### 02b -> 03 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+"""
+add a /api/users POST endpoint to create a user
+"""
+VERSION = "02"
+# !diff(1:6) +
+'''
+add a /api/users GET endpoint to list users
+'''
+VERSION = "03"
+
+import json
+from flask import Flask
+from flask import request
+# !className separator
+..............................
+        return dict(error=f"{type(exc)}: {exc}"), 422
+# !diff(1:12) +
+# try it with
+"""
+http :5001/api/users
+"""
+@app.route('/api/users', methods=['GET'])
+def list_users():
+    users = User.query.all()
+    return [dict(
+            id=user.id, name=user.name, email=user.email, nickname=user.nickname)
+        for user in users]
+
+
+if __name__ == '__main__':
+    app.run()
+```
+
+## Step 04: serve a basic frontend
+
+In this move we add in the mix the first seed of the app frontend
+
+### new files 
+
+To this end we add the following files:
+
+- `static/style.css` - the CSS file; not much to say about that one..
+- `templates/users.html.j2` - the Jinja2 template for a welcome page, that lists known users
+
+### new endpoint
+
+And we also add a dedicated endpoint `/front/users` that will serve this page; the way it is intended to work is:
+
+1. you direct your browser to `http://localhost:5001/front/users`
+1. which will call the `/api/users` endpoint
+1. which in turn will retrieve all users from the DB
+1. and pass that list to the new **Jinja2 template** (the .j2 file)
+1. that will create one custom HTML element per user
+1. and return the full HTML page - with all users - back to the browser
+
+### new imports
+
+We need:
+
+- `render_template` to render the Jinja2 template;
+- `requests` to call the `/api/users` endpoint
+
+### templating
+
+the basics for Jinja2 templating is:
+
+- you compute one or several variables on the Python side - here e.g. we have `users` and `VERSION`
+- you pass them to the template with `render_template()`
+  ```python
+  render_template('users.html.j2', users=users, version=VERSION)
+  ```
+- and from then on you can access the variables in the template with the corresponding names - here `users` and `version`
+- for example, to display the version in the template, we use:
+  ```html
+  <h1>Welcome to the chat app (version {{ version }})</h1>
+  ```
+- Jinja also offers more advanced features, like loops and conditionals; observe how the template iterates over the `users` variable to create one HTML element per user
+  ```html
+    {% for user in users %}
+        <div class="user">
+        <h2>{{ user.name }}</h2>
+        <p>{{ user.email }}</p>
+        <p>{{ user.nickname }}</p>
+        </div>
+    {% endfor %}
+    ```
+
+### keeping the app modular
+
+Step #3 deserves a few more words; to retrieve all user details, we have a choice between:
+
+- asking the database directly
+- or forwarding the request to the `/api/users` endpoint
+
+We have gone for the latter option, as it is more in line with the micro-services philosophy  
+The idea is that even though our current deployment runs in a single Flask app,
+we want to be able to **deploy it in more distributed way**, with the services for
+- the database
+- the `/front/`
+- and the `/api/` endpoints
+
+all running in different containers/computers
+
+Also note that this way of doing things is SSR (Server-Side rendering); relying
+on the API to implement this endpointmakes it more likely for us move to CSR
+(Client-Side rendering) in the future if need be.
+### 03 -> 04 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+'''
+add a /api/users GET endpoint to list users
+'''
+VERSION = "03"
+# !diff(1:4) +
+"""
+/front/users serves a web page to see the users
+"""
+VERSION = "04"
+import json
+# !diff(1:1) +
+import requests
+from flask import Flask
+from flask import request
+# !diff(1:1) +
+from flask import render_template
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import text
+# !className separator
+..............................
+        for user in users]
+# !diff(1:26) +
+
+## Frontend
+# for clarity we define our routes in the /front namespace
+# however in practice /front/users would probably be just /users
+
+# try it by pointing your browser to
+"""
+http://localhost:5001/front/users
+"""
+@app.route('/front/users')
+def front_users():
+    # first option of course, is to get all users from DB
+    # users = User.query.all()
+    # but in a more fragmented architecture we would need to
+    # get that info at another endpoint
+    # here we ask ourselves on the /api/users route
+    url = request.url_root + '/api/users'
+    req = requests.get(url)
+    if not (200 <= req.status_code < 300):
+        # return render_template('errors.html', error='...')
+        return dict(error=f"could not request users list", url=url,
+                    status=req.status_code, text=req.text)
+    users = req.json()
+    return render_template('users.html.j2', users=users, version=VERSION)
+
+
+if __name__ == '__main__':
+    app.run()
+```
+
+### in 04 - new file: static/style.css
+
+```css style.css
+/* !diff(1:34) + */
+#users {
+    display: flex;
+    flex: row wrap;
+    justify-content: center;
+}
+
+.user {
+    background-color: rgb(229, 248, 202);
+    border: 0.5px solid lightgrey;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 10px 20px;
+
+    .pill {
+        background-color: rgb(214, 238, 246);
+        border-radius: 8px;
+        padding: 10px;
+        margin-right: 10px;
+        color: rgb(52, 51, 51);
+    }
+
+    a {
+        text-decoration: none;
+        color: gray;
+    }
+}
+
+#messages {
+    width: 100%;
+    th, td {
+        border: 1px solid lightgrey;
+        text-align: center;
+    }
+}
+```
+
+### in 04 - new file: templates/users.html.j2
+
+```html users.html.j2
+<!-- !diff(1:17) + -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/static/style.css">
+    </head>
+    <body>
+        <h1>Known users - Version {{version}}</h1>
+        <div id="users">
+            {% for user in users %}
+                <span class="user">
+                    <a class="pill" href="/front/messages/{{user.id}}">{{user.nickname}} ({{user.name}})</a>
+                    <a href="mailto:{{user.email}}">{{user.email}}</a>
+                </span>
+            {% endfor %}
+        </div>
+    </body>
+</html>
+```
+
+## step 05: how to redirect
+
+Nothing crucial here, but an opportunity to show how to redirect HTTP traffic
+
+### what is a redirect ?
+
+There are many reasons why you would want to redirect a request to another URL:
+
+- the URL has changed
+- the resource is now located on another server
+- ...
+
+### how to redirect
+
+In Flask you can use the `redirect()` function to redirect a request to another URL; it's dead simple;
+in our case we just redirect the `/' URL to the `/front/users` URL:
+
+### see also
+
+in particular about the HTTP codes, see:
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections
+### 04 -> 05 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+"""
+/front/users serves a web page to see the users
+"""
+VERSION = "04"
+# !diff(1:4) +
+'''
+redirect the / route to /front/users
+'''
+VERSION = "05"
+import json
+import requests
+# !className separator
+..............................
+from flask import Flask
+from flask import request
+from flask import render_template
+# !diff(1:1) +
+from flask import redirect
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import text
+# !className separator
+..............................
+@app.route('/')
+def hello_world():
+# !diff(1:1) -
+    return f'hello, this is a chat app! (version {VERSION})'
+# !diff(1:3) +
+    # redirect to /front/users
+    # actually this is just a rsponse with a 301 HTTP code
+    return redirect('/front/users')
+# try it with
+# !className separator
+..............................
+"""
+http :5001/api/users name="Alice Caroll" email="alice@foo.com" nickname="alice"
+http :5001/api/users name="Bob Morane" email="bob@foo.com" nickname="bob"
+# !diff(1:1) +
+http :5001/api/users name="Charlie Chaplin" email="charlie@foo.com" nickname="charlie"
+"""
+@app.route('/api/users', methods=['POST'])
+def create_user():
+```
+
+## Step 06: add a /api/users/*id* endpoint
+
+A new endpoint to get the details of one specific user from their ID
+
+Nothing new indeed, very similar to the `/api/users` endpoint, except that we
+use the `get()` method to retrieve the user by its primary key
+
+(and we still need to convert the `User` object to a regular Python dictionary)
+### 05 -> 06 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+'''
+redirect the / route to /front/users
+'''
+VERSION = "05"
+# !diff(1:4) +
+"""
+new GET endpoint /api/users/<user_id> to retrieve a single user
+"""
+VERSION = "06"
+import json
+import requests
+# !className separator
+..............................
+        for user in users]
+# !diff(1:15) +
+# try it with
+"""
+http :5001/api/users/1
+"""
+@app.route('/api/users/<int:id>', methods=['GET'])
+def list_user(id):
+    try:
+        # as id is the primary key
+        user = User.query.get(id)
+        return dict(
+            id=user.id, name=user.name, email=user.email, nickname=user.nickname)
+    except Exception as exc:
+        return dict(error=f"{type(exc)}: {exc}"), 422
+
+
+## Frontend
+# for clarity we define our routes in the /front namespace
+```
+
+## step 07: a new table for storing messages
+
+In this very rustic app, a message is simply a text sent from one user (the author) to another one (the recipient)
+
+Nothing exactly new here; we use the same approach as for the users, but this time we deal with messages
+
+### using primary keys to model relationships
+
+Worth being noted though, in the `Message` class we need to refer to the `User`
+class (for the author and recipient)  
+the standard approach here is **to use the primary keys** in the `messages` table
+
+hence the `author_id` and `recipient_id` columns, that are both `Integer`, and
+declares as `ForeignKey` to the `id` column of the `users` table
+
+This is an intermediary step, and in a future step down the road we will improve
+this a bit, but it's helpful to understand how to deal with foreign keys in
+SQLAlchemy;
+
+### 06 -> 07 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+"""
+new GET endpoint /api/users/<user_id> to retrieve a single user
+"""
+VERSION = "06"
+# !diff(1:4) +
+'''
+create a table for messages
+'''
+VERSION = "07"
+import json
+# !diff(1:1) +
+from datetime import datetime as DateTime
+import requests
+from flask import Flask
+# !className separator
+..............................
+    name = db.Column(db.String)
+    email = db.Column(db.String)
+    nickname = db.Column(db.String)
+# !diff(1:8) +
+
+class Message(db.Model):
+    __tablename__ = 'messages'
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    date = db.Column(db.DateTime)
+# actually create the database (i.e. tables etc)
+```
+
+## step 07: an endpoint to create messages
+
+nothing new here as compared to users; except the minor point that the `date`
+column is not provided by the caller, but computed by the API at creation time
+
+### try it out
+
+Here's a trick that can help you populate the DB with some users and messages, from scratch;
+especially as we might have to do this over and over again
+
+#### create a bash file
+
+copy and paste the following in a file named `aliases.sh` (or whatever you want)
+
+```bash
+# put this in aliases.sh
+function list-users() {
+    http :5001/api/users
+}
+
+function create-users() {
+    http :5001/api/users name="Alice Caroll" email="alice@foo.com" nickname="alice"
+    http :5001/api/users name="Bob Morane" email="bob@foo.com" nickname="bob"
+    http :5001/api/users name="Charlie Chaplin" email="charlie@foo.com" nickname="charlie"
+}
+
+function create-messages() {
+    http :5001/api/messages author_id=1 recipient_id=2 content="trois petits chats"
+    http :5001/api/messages author_id=2 recipient_id=1 content="chapeau de paille"
+    http :5001/api/messages author_id=2 recipient_id=3 content="not visible by 1"
+}
+
+function create-all() {
+    create_users
+    create_messages
+}
+
+function message-to-alice() {
+    http :5001/api/messages author_id=3 recipient_id=1 content="from the API"
+}
+```
+
+#### load the file
+
+By running the following, you will load the file in your current shell session
+
+```bash
+source aliases.sh
+```
+
+#### run the commands
+
+After you've source'd `aliases.sh` your shell knows about
+the functions defined in the file; so you can do
+
+```bash
+create-users
+create-messages
+list-users
+```
+### 07 -> 07b - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:3) -
+'''
+create a table for messages
+'''
+# !diff(1:3) +
+''''
+new POST endpoint /api/messages to create a message
+''''
+VERSION = "07"
+import json
+# !className separator
+..............................
+        return dict(error=f"{type(exc)}: {exc}"), 422
+# !diff(1:27) +
+# try it with
+"""
+http :5001/api/messages author_id=1 recipient_id=2 content="trois petits chats"
+http :5001/api/messages author_id=2 recipient_id=1 content="chapeau de paille"
+http :5001/api/messages author_id=1 recipient_id=2 content="paillasson"
+http :5001/api/messages author_id=2 recipient_id=1 content="somnambule"
+http :5001/api/messages author_id=1 recipient_id=2 content="bulletin"
+http :5001/api/messages author_id=2 recipient_id=1 content="tintamarre"
+http :5001/api/messages author_id=2 recipient_id=3 content="not visible by 1"
+"""
+@app.route('/api/messages', methods=['POST'])
+def create_message():
+    try:
+        parameters = json.loads(request.data)
+        content = parameters['content']
+        author_id = parameters['author_id']
+        recipient_id = parameters['recipient_id']
+        date = DateTime.now()
+        new_message = Message(content=content, date=date,
+                              author_id=author_id, recipient_id=recipient_id)
+        db.session.add(new_message)
+        db.session.commit()
+        return parameters
+    except Exception as exc:
+        return dict(error=f"{type(exc)}: {exc}"), 422
+
+
+## Frontend
+# for clarity we define our routes in the /front namespace
+```
+
+## step 08: retrieve messages
+
+super straightforward step, just retrieve all messages
+
+not very useful actually, but only for completeness.
+### 07b -> 08 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+''''
+new POST endpoint /api/messages to create a message
+''''
+VERSION = "07"
+# !diff(1:4) +
+"""
+new GET /api/messages/ to retrieve all messages
+"""
+VERSION = "08"
+import json
+from datetime import datetime as DateTime
+# !className separator
+..............................
+        return parameters
+    except Exception as exc:
+        return dict(error=f"{type(exc)}: {exc}"), 422
+# !diff(1:13) +
+
+
+# try it with
+"""
+http :5001/api/messages
+"""
+@app.route('/api/messages', methods=['GET'])
+def list_messages():
+    messages = Message.query.all()
+    return [dict(
+            id=message.id, content=message.content, date=message.date,
+            author_id=message.author_id, recipient_id=message.recipient_id)
+        for message in messages]
+```
+
+## step 09: get messages for a user
+
+more useful now, we need an API endpoint to retrieve messages for a given user  
+like always we will refer to the user **by its primary key**, so that is the
+expected parameter in the URL
+
+in other words, /api/messages/with/1 will return all messages for the user with id 1
+
+### a first implementation
+
+in this first naive approach, we return messages **with only user ids** (i.e. without their nickname)  
+also we will only return messages where the user is the **recipient**  
+this is not very useful, but again it will help us understand how to properly deal with relationships
+
+### nothing out of the ordinary
+
+we can use the exact same approach as for the users:
+
+- we run a query on the `messages` table
+- and we simply filter it by the `recipient_id` column
+
+### something missing
+
+in a practical app, we would probably need to return **BOTH** messsages that have the user as recipient **and as author**
+
+but let's not get ahead of ourselves, we will improve all this later on
+### 08 -> 09 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+"""
+new GET /api/messages/ to retrieve all messages
+"""
+VERSION = "08"
+# !diff(1:4) +
+'''
+new GET /api/messages/with/<user_id> endpoint - first draft
+'''
+VERSION = "09"
+import json
+from datetime import datetime as DateTime
+# !className separator
+..............................
+            author_id=message.author_id, recipient_id=message.recipient_id)
+        for message in messages]
+# !diff(1:21) +
+
+# try it with
+"""
+http :5001/api/messages/with/1
+"""
+@app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
+def list_messages_to(recipient_id):
+    """
+    returns only the messages to a given person
+    a first naive approach is to filter all messages by recipient_id
+    """
+    messages = Message.query.filter_by(recipient_id=recipient_id).all()
+    return [
+        # rebuild dict (JSON-able) objects from the SQLAlchemy objects
+        dict(
+            id=message.id,
+            author_id=message.author_id,
+            recipient_id=message.recipient_id,
+            content=message.content,  date=message.date)
+        for message in messages
+    ]
+## Frontend
+```
+
+## step 10: getting messages with a user
+
+first improvement to the previous step, we will now return messages **with** the user and not only **for** the user  
+meaning that we need to write a little more elaborate filter, and look for messages that have the user as **either** the author or the recipient
+
+which in logical terms amounts to doing a `OR` between the two conditions  
+hence the import of the `or_` function from SQLAlchemy, that will allow us to combine the two conditions
+### 09 -> 10 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+'''
+new GET /api/messages/with/<user_id> endpoint - first draft
+'''
+VERSION = "09"
+# !diff(1:4) +
+"""
+/api/messages/with/<user_id> returns both from and to user
+"""
+VERSION = "10"
+import json
+from datetime import datetime as DateTime
+# !className separator
+..............................
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import text
+# !diff(1:1) +
+from sqlalchemy.sql import or_
+## usual Flask initilization
+app = Flask(__name__)
+# !className separator
+..............................
+@app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
+def list_messages_to(recipient_id):
+    """
+# !diff(1:2) -
+    returns only the messages to a given person
+    a first naive approach is to filter all messages by recipient_id
+# !diff(1:3) +
+    returns only messages to and from a given person
+    need to write a little more elaborate query
+    we still can only return author_id and recipient_id
+    """
+# !diff(1:1) -
+    messages = Message.query.filter_by(recipient_id=recipient_id).all()
+# !diff(1:6) +
+    messages = Message.query.filter(
+        or_(
+            Message.author_id==recipient_id,
+            Message.recipient_id==recipient_id,
+        )
+    ).all()
+    return [
+# !diff(1:1) -
+        # rebuild dict (JSON-able) objects from the SQLAlchemy objects
+        dict(
+            id=message.id,
+            author_id=message.author_id,
+```
+
+## step 11: retrieving more details with messages
+
+this now is interesting; 
+
+imagine you write the frontend, and you need to display messages; so typically alice has sent a message to bob  
+with the current code, you would get something like this:
+
+```json
+{
+    "id": 1,
+    "author_id": 1,
+    "recipient_id": 2,
+    "content": "trois petits chats"
+}
+```
+which is not very useful, as you need to display the name of the author and the recipient, not just their ids !
+
+### relationships
+
+the trick here is to extend our ORM and to make it explicit that, in addition to
+the `author_id` and `recipient_id` columns, we also want to leverage the `User`
+class to get the author and recipient **details** for each message
+
+that is the purpose of these lines here in the `Message` class:
+
+```python
+author = relationship("User", foreign_keys=[author_id])
+recipient = relationship("User", foreign_keys=[recipient_id])
+```
+
+### impact on the endpoint
+
+as we have decided earlier, we stick to the strategy that we explicitly build the dicts returned by the API  
+so in the `/api/messages/with/<id>` endpoint, we add a `author` and a
+`receiver` keys to the returned dict (and thus remove the `author_id` and
+`recipient_id` keys that can now be retrieved through the `author` and
+`recipient` relationships)
+### 10 -> 11 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+"""
+/api/messages/with/<user_id> returns both from and to user
+"""
+VERSION = "10"
+# !diff(1:4) +
+'''
+/api/messages/with/<user_id> returns users details
+'''
+VERSION = "11"
+import json
+from datetime import datetime as DateTime
+# !className separator
+..............................
+    recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    date = db.Column(db.DateTime)
+# !diff(1:3) +
+    # Define relationships (to fetch User objects directly)
+    author = db.relationship('User', foreign_keys=[author_id], backref='sent_messages')
+    recipient = db.relationship('User', foreign_keys=[recipient_id], backref='received_messages')
+# actually create the database (i.e. tables etc)
+with app.app_context():
+# !className separator
+..............................
+            Message.recipient_id==recipient_id,
+        )
+    ).all()
+# !diff(1:2) +
+    # now we have in message.author and message.recipient
+    # the actual User objects
+    return [
+        dict(
+            id=message.id,
+# !diff(1:2) -
+            author_id=message.author_id,
+            recipient_id=message.recipient_id,
+# !diff(1:6) +
+            author = dict(
+                id=message.author.id, name=message.author.name,
+                email=message.author.email, nickname=message.author.nickname),
+            recipient = dict(
+                id=message.recipient.id, name=message.recipient.name,
+                email=message.recipient.email, nickname=message.recipient.nickname),
+            content=message.content,  date=message.date)
+        for message in messages
+    ]
+```
+
+## step 12: a frontend to display messages
+
+just like we did earlier for users, it's time to build a frontend to display messages  
+this comes in two parts:
+- a new frontend endpoint `/front/messages/<id>` that will be the main page for one user
+- an html template that will display the messages relevant for a given user
+
+### accessing the DB
+
+like for the earlier step, we refrain from accessing the DB directly, and use
+the `/api/messages/with/<id>` endpoint  
+the arguments we had for users - the fact that we want the app to remain modular - still holds as well of course  
+plus, on top of that, the approach here makes even more sense, in that the logic for
+retrieval this time is a little more complex, and **should not be duplicated**
+
+### the template
+
+the template is created with 2 variables:
+
+- `user`: the details about the user, that we get .. wait for it .. from the
+  `/api/users/<id>` endpoint
+- `messages`: the messages for the user, that we get from the
+  `/api/messages/with/<id>` endpoint
+
+in this first version we just display the messages, we'll add a prompt area later on
+
+### other caveats
+
+at this point, the main default is, we don't see incoming messages as they are
+posted; the user needs to refresh the page to see new messages; a bit of
+patience...
+### 11 -> 12 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+'''
+/api/messages/with/<user_id> returns users details
+'''
+VERSION = "11"
+# !diff(1:4) +
+"""
+/front/messages/<user_id> builds a html page to see messages
+"""
+VERSION = "12"
+import json
+from datetime import datetime as DateTime
+# !className separator
+..............................
+    return render_template('users.html.j2', users=users, version=VERSION)
+# !diff(1:25) +
+# try it by pointing your browser to
+"""
+http://localhost:5001/front/messages/1
+"""
+@app.route('/front/messages/<int:recipient>')
+def front_messages(recipient):
+    # same as for the users, let's pretend we don't have direct access to the DB
+    url = request.url_root + f'/api/users/{recipient}'
+    req1 = requests.get(url)
+    if not (200 <= req1.status_code < 300):
+        return dict(error="could not request user info", url=url,
+                    status=req1.status_code, text=req1.text)
+    user = req1.json()
+    req2 = requests.get(request.url_root + f'/api/messages/with/{recipient}')
+    if not (200 <= req2.status_code < 300):
+        return dict(error="could not request messages list", url=url,
+                    status=req2.status_code, text=req2.text)
+    messages = req2.json()
+    return render_template(
+        'messages.html.j2',
+        user=user, messages=messages,
+    )
+
+
+
+if __name__ == '__main__':
+    app.run()
+```
+
+### in 12 - new file: templates/messages.html.j2
+
+```html messages.html.j2
+<!-- !diff(1:29) + -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/static/style.css">
+    </head>
+    <body>
+        <a href="/">Back to the main page</a>
+        <h1>The messages for user {{user.nickname}} ({{user.name}})</h1>
+        <table id="messages">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody
+            {% for message in messages %}
+                <tr>
+                    <td>{{message.date}}</td>
+                    <td>{{message.author.nickname}}</td>
+                    <td>{{message.recipient.nickname}}</td>
+                    <td>{{message.content}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>
+```
+
+## step 13: the frontend can send messages too
+
+it's nice to see the messages; but better still, we'd need to be able to send messages as well
+
+in order to achieve this, we need:
+
+- more information made available in the frontend page: the list of users, so that the user can select a recipient
+- in the frontend as well, a new form area to send messages
+- a new frontend script - stored in `static/script.js` - that will actually send the message - by talking back to the API
+
+### the /front/ endpoint
+
+- simply makes a 3rd request to the API, to get the list of users
+
+### the template
+
+- injects the new JS script
+- adds a new form area to send messages, that has as many `<input>` fields as there are fields in a message, namely
+  - a `hidden` input with the `author_id` (the user id) - that won't change, but is required as part of the newly created message
+  - a `<select>` tag for the recipient
+  - a `<input>` tag for the content, typed as `text`
+
+### the new JS script
+
+- as we've learned in the frontend courses, the script arranges to execute itself when the page is loaded
+- at that time it binds the 'submit' event of the form to a function that will
+  - prevent the default behavior of the form (which would be to reload the page)
+  - get the values of the fields in the form
+  - and send them to the API, using a `POST` request
+
+**Note**: there actually is a default behaviour for a form submission event,
+which uses the `action` and `method` attributes of the form to determine where
+to send the data. However that default behaviour does not support JSON encoding,
+this is the only reason why we need to bother with the JS script at that point.  
+(we will take advantage of our custom script in the next steps anyway, so it's
+no regret)
+
+### still missing
+
+and fixed in the next step:
+
+the page does not refresh after sending a message; i.e. the new message is not
+displayed in the list of messages
+### 12 -> 13 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+"""
+/front/messages/<user_id> builds a html page to see messages
+"""
+VERSION = "12"
+# !diff(1:4) +
+'''
+/front/messages/<user_id> has a dialog to send messages
+'''
+VERSION = "13"
+import json
+from datetime import datetime as DateTime
+# !className separator
+..............................
+        author_id = parameters['author_id']
+        recipient_id = parameters['recipient_id']
+        date = DateTime.now()
+# !diff(1:1) +
+        print("received request to create message", author_id, recipient_id, content)
+        new_message = Message(content=content, date=date,
+                              author_id=author_id, recipient_id=recipient_id)
+        db.session.add(new_message)
+# !className separator
+..............................
+        return dict(error="could not request messages list", url=url,
+                    status=req2.status_code, text=req2.text)
+    messages = req2.json()
+# !diff(1:4) +
+    # not trying to optimize for now
+    url = request.url_root + '/api/users'
+    req3 = requests.get(url)
+    users = req3.json()
+    return render_template(
+        'messages.html.j2',
+        user=user, messages=messages,
+# !diff(1:1) +
+        users=users,
+    )
+```
+
+### 12 -> 13 - changes in file: templates/messages.html.j2
+
+```html messages.html.j2
+<!-- !className separator -->
+..............................
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/static/style.css">
+<!-- !diff(1:1) + -->
+        <script type="text/javascript" src="/static/script.js"></script>
+    </head>
+    <body>
+        <a href="/">Back to the main page</a>
+<!-- !className separator -->
+..............................
+                </tr>
+            {% endfor %}
+        </table>
+<!-- !diff(1:12) + -->
+        <form id="send-form" action="/api/messages" method="post">
+            <input type="hidden" name="author_id" value="{{user.id}}">
+            <label for="recipient">Recipient:</label>
+            <select name="recipient_id">
+                {% for recipient in users %}
+                    {% if user.id != recipient.id %}
+                        <option value="{{recipient.id}}">{{recipient.nickname}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <input type="text" id="message" name="content">
+        </form>
+    </body>
+</html>
+```
+
+### in 13 - new file: static/script.js
+
+```js script.js
+// !diff(1:19) +
+// surprisingly there is no way to tell a <form> that it should submit as JSON
+
+const formToJSON = form => Object.fromEntries(new FormData(form))
+
+document.addEventListener('DOMContentLoaded', async (event) => {
+    console.log("loading custom script")
+    document.getElementById('send-form').addEventListener('submit',
+        async (event) => {
+            // turn off default form behaviour
+            event.preventDefault()
+            const json = formToJSON(event.target)
+            const action = event.target.action
+            await fetch(action, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(json)
+            })
+        })
+    })
+```
+
+## step 14: also display newly created message
+
+upon successful creation of a message, the API returns the message details so,
+we can use that to display the message in the frontend
+
+in the mix, we can also take care of any error that may occur, and inform the
+user (actually in this rustic app we just log in the console)
+
+### the JS script
+
+we just need to extend the JS script to handle the response from the API; for
+that
+- we improve on the sequence of `.then()` calls
+- if the response is a success, we create a new row in the messages table
+- and if not we use a `.catch()` to log the error in the console
+
+### the caveats
+
+at this point in time, the data returned by the API about the newly created
+message only contains user ids, not the user names
+### 13 -> 14 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+'''
+/front/messages/<user_id> has a dialog to send messages
+'''
+VERSION = "13"
+# !diff(1:5) +
+"""
+/front/messages/<user_id> keeps track of the message it just sent
+see also differences in script.js
+"""
+VERSION = "14"
+import json
+from datetime import datetime as DateTime
+```
+
+### 13 -> 14 - changes in file: static/script.js
+
+```js script.js
+// !className separator
+..............................
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(json)
+            })
+// !diff(1:13) +
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data)
+                // at this point the return of /api/messages is its parameters
+                // so we don't know the author and recipient nicknames
+                const {author_id, recipient_id, content, date} = data
+                const newRow = document.createElement('tr')
+                newRow.innerHTML = `<td>${date}</td><td>${author_id}</td><td>${recipient_id}</td><td>${content}</td>`
+                document.getElementById('messages').appendChild(newRow)
+            })
+            .catch((error) => {
+                console.error('Error:', error)
+            })
+        })
+    })
+```
+
+## step 15: display nicknames in newly created messages
+
+to be able to display the nicknames of the users in the newly created messages,
+we need to slightly tweak our `/api/messages` endpoint  
+instead of returning a `author_id` and a `recipient_id`, we will return the
+`author` and `recipient` objects with full details
+
+for that the endpoint does 2 requests to the DB
+
+**Note** in real life, one tends to optimize the number of requests to the DB;  
+it would be possible to get the `author` and `recipient` objects in one go, but
+here we are not in a performance context, and we want to keep things simple
+
+### caveats
+
+now the app works reasonably fine as far as sending messages is concerned  
+but it still sucks in terms of receiving messages; we have no simple way to be
+made aware of incoming messages
+### 14 -> 15 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:5) -
+"""
+/front/messages/<user_id> keeps track of the message it just sent
+see also differences in script.js
+"""
+VERSION = "14"
+# !diff(1:6) +
+'''
+/api/messages creation endpoint returns more details
+like author and recipient, and date
+see also changes in script.js
+'''
+VERSION = "15"
+import json
+from datetime import datetime as DateTime
+# !className separator
+..............................
+        content = parameters['content']
+        author_id = parameters['author_id']
+        recipient_id = parameters['recipient_id']
+# !diff(1:3) +
+        # check that author and recipient exist
+        author = User.query.get(author_id)
+        recipient = User.query.get(recipient_id)
+        date = DateTime.now()
+        print("received request to create message", author_id, recipient_id, content)
+        new_message = Message(content=content, date=date,
+                              author_id=author_id, recipient_id=recipient_id)
+        db.session.add(new_message)
+        db.session.commit()
+# !diff(1:6) +
+        # expose more details in the response
+        parameters['author'] = dict(
+            id=author.id, name=author.name, email=author.email, nickname=author.nickname)
+        parameters['recipient'] = dict(
+            id=recipient.id, name=recipient.name, email=recipient.email, nickname=recipient.nickname)
+        parameters['date'] = date
+        return parameters
+    except Exception as exc:
+        return dict(error=f"{type(exc)}: {exc}"), 422
+```
+
+### 14 -> 15 - changes in file: static/script.js
+
+```js script.js
+// !className separator
+..............................
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data)
+// !diff(1:3) -
+                // at this point the return of /api/messages is its parameters
+                // so we don't know the author and recipient nicknames
+                const {author_id, recipient_id, content, date} = data
+// !diff(1:2) +
+                // now we can diplay the author and recipient nicknames
+                const {author, recipient, content, date} = data
+                const newRow = document.createElement('tr')
+// !diff(1:1) -
+                newRow.innerHTML = `<td>${date}</td><td>${author_id}</td><td>${recipient_id}</td><td>${content}</td>`
+// !diff(1:1) +
+                newRow.innerHTML = `<td>${date}</td><td>${author.nickname}</td><td>${recipient.nickname}</td><td>${content}</td>`
+                document.getElementById('messages').appendChild(newRow)
+            })
+            .catch((error) => {
+```
+
+## step 16: pouring SocketIO into the mix
+
+to make the app more reactive, we will use SocketIO, so the backend can notify
+the frontend of incoming messages
+
+in this first - admittedly quite limited - step, we just lay the groundwork for
+adding SocketIO in the picture, even though it is not actually used for anything
+useful yet
+
+### SocketIO basics
+
+SocketIO is a library that enables real-time, bidirectional communication between
+clients and servers. It is built on top of WebSockets, which is a protocol that
+allows for full-duplex communication channels over a single TCP connection.
+
+SocketIO provides a higher-level abstraction over WebSockets, making it easier to
+work with. It handles many of the complexities of WebSockets, such as
+reconnection, event handling, and broadcasting messages to multiple clients.
+
+It exposes the notion of **channels** (or **rooms**) that kind of like act as
+multicast groups: a message sent to a channel reaches all clients subscribed to
+that channel. Exactly what we need here then.
+
+### SocketIO implementations
+
+in our context, we actually need two SocketIO implementations:
+
+- one for the backend - so, in Python, and more specifically for Flask
+- and one for the frontend - so, in JS
+- the backend will be responsible for sending messages to the frontend each time a message gets created
+- and the frontend will be responsible for 
+  - connecting the server in the first place
+  - subscribing to the right channel (since our app has only DMs and no room, we will use one channel per user)
+  - and reacting to incoming messages - typically by displaying them in the UI
+
+So, what does all that take actually, in terms of code changes ?
+
+### boilerplate
+
+in `app.py`
+
+- we need to import (and `pip install` if needed) the `flask-socketio` package
+- and to create a `SocketIO` instance called `socketio` - it will in some context act as a replacement for the Flask `app`
+
+### a socketIO callback (kind-of like an endpoint)
+
+still in `app.py`
+
+- we create a function called `connect_ack`
+- the syntax for creating it looks a bit like the one for a regular Flask endpoint  
+  except the decorator is `@socketio.on` instead of `@app.route`
+- the name used for creating it - here `connect-ack` is the **name of a channel**
+
+so what we're saying here is, each time a message occurs on the `connect-ack` channel, the backend will print a message about that  
+we could have gone entirely without the `connect-ack` channel, but it is a good way to test that the connection is working
+
+### in the HTML template
+
+this is the place where we add the SocketIO client-side code into the mix; as always we use a `<script>` tag in `<head>` to do that; we picked a CDN for that
+
+### the JS code
+
+upon document loading, the JS code will 
+
+- create a connection to the server using `socket = io()`
+- and then define a callback function
+- that will trigger upon a `connect` event (this time this is a builtin name, as
+  opposed to the `connect-ack` channel we created earlier)
+- and so this is how the frontend will send an acknowledgment to the backend
+  upon successful connection
+
+### expected behaviour
+
+all this means that, when the web page is loaded:
+
+- the frontend connects to the backend
+- once connected it says so on the console
+- and sends an acknowledgment to the backend
+- which prints a message on the console as well
+
+of course all this traffic is purely for educational purposes, and is not
+required for the app to work properly
+### 15 -> 16 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:6) -
+'''
+/api/messages creation endpoint returns more details
+like author and recipient, and date
+see also changes in script.js
+'''
+VERSION = "15"
+# !diff(1:4) +
+"""
+app.py enables SocketIO & the front (HTML) messages page connects to the socket
+"""
+VERSION = "16"
+import json
+from datetime import datetime as DateTime
+# !className separator
+..............................
+from flask import request
+from flask import render_template
+from flask import redirect
+# !diff(1:1) +
+from flask_socketio import SocketIO
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import text
+# !className separator
+..............................
+## usual Flask initilization
+app = Flask(__name__)
+# !diff(1:1) +
+socketio = SocketIO(app)
+## DB declaration
+# !className separator
+..............................
+        users=users,
+    )
+# !diff(1:9) +
+#
+# cannot be triggered through http
+# there is a socket-io CLI client that can be installed with
+# npm i -g socket.io-cli
+# in our case, the first test will be from the messages HTML page
+#
+@socketio.on('connect-ack')
+def connect_ack(message):
+    print(f'received ACK message: {message} of type {type(message)}')
+if __name__ == '__main__':
+# !diff(1:1) -
+    app.run()
+# !diff(1:1) +
+    socketio.run(app)
+```
+
+### 15 -> 16 - changes in file: static/script.js
+
+```js script.js
+// !className separator
+..............................
+const formToJSON = form => Object.fromEntries(new FormData(form))
+document.addEventListener('DOMContentLoaded', async (event) => {
+// !diff(1:1) -
+    console.log("loading custom script")
+// !diff(1:6) +
+    console.log("connecting to the SocketIO backend")
+    const socket = io()
+    socket.on('connect', () => {
+        console.log('Connected!')
+        socket.emit('connect-ack', {messages: 'I\'m connected!'})
+    })
+    document.getElementById('send-form').addEventListener('submit',
+        async (event) => {
+            // turn off default form behaviour
+```
+
+### 15 -> 16 - changes in file: templates/messages.html.j2
+
+```html messages.html.j2
+<!-- !className separator -->
+..............................
+    <head>
+        <link rel="stylesheet" type="text/css" href="/static/style.css">
+        <script type="text/javascript" src="/static/script.js"></script>
+<!-- !diff(1:5) + -->
+        <!-- the socket.io library is used to connect to the ws endpoints on the server -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+            integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+            crossorigin="anonymous">
+        </script>
+    </head>
+<!-- !diff(1:1) + -->
+
+    <body>
+        <a href="/">Back to the main page</a>
+        <h1>The messages for user {{user.nickname}} ({{user.name}})</h1>
+```
+
+## step 17: subscribe to the nickname channel
+
+our next move is to subscribe to the nickname channel  
+but wait, the JS code currently is static, and has no access to the nickname
+
+we have 2 options here:
+
+1. make the JS code a template, and instantiate it with the nickname
+1. pass the nickname to the JS code **through the HTML tree**
+
+### change in the template
+
+actually, the first option is a little awkward, there is no need to make the JS
+code a template;
+
+instead we can simply attach the nickname in the HTML tree; and there is a
+standard practice for that, which is to add a **data attribute** to the HTML
+element; and since this is of interest to the whole tree, we pick the `<body>`
+element for that purpose
+
+hence this line in the HTML template:
+
+```html
+<body data-nickname="{{ user.nickname }}">
+```
+
+### change in the JS code
+
+from then on, the nickname becomes accessible in the JS code, thanks to this
+line
+
+```javascript
+    const nickname = document.body.dataset.nickname
+```
+
+and from there, we can simply subscribe to the nickname channel, using the
+`socket.on()` method like before
+
+### what's left then ?
+
+but of course this version is not functional yet, as nobody writes on that
+channel yet...
+### 16 -> 17 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+"""
+app.py enables SocketIO & the front (HTML) messages page connects to the socket
+"""
+VERSION = "16"
+# !diff(1:5) +
+'''
+pass current nickname to the JS code
+use it to subscribe to that SocketIO channel
+'''
+VERSION = "17"
+import json
+from datetime import datetime as DateTime
+```
+
+### 16 -> 17 - changes in file: static/script.js
+
+```js script.js
+// !className separator
+..............................
+document.addEventListener('DOMContentLoaded', async (event) => {
+    console.log("connecting to the SocketIO backend")
+    const socket = io()
+// !diff(1:2) +
+    // we are storing the nickname in the body element
+    const nickname = document.body.dataset.nickname
+    socket.on('connect', () => {
+        console.log('Connected!')
+// !diff(1:1) -
+        socket.emit('connect-ack', {messages: 'I\'m connected!'})
+// !diff(1:1) +
+        socket.emit('connect-ack', {messages: `${nickname} has connected!`})
+    })
+// !diff(1:6) +
+    // so we can subscribe to that channel
+    socket.on(nickname, (data) => {
+        // the backend does not yet send anything to this channel, but anticipating a bit...
+        alert(`received ${data} from socketio on the ${nickname} channel`)
+    })
+    console.log(`subscribed to the ${nickname} channel`)
+    document.getElementById('send-form').addEventListener('submit',
+        async (event) => {
+            // turn off default form behaviour
+```
+
+### 16 -> 17 - changes in file: templates/messages.html.j2
+
+```html messages.html.j2
+<!-- !className separator -->
+..............................
+        </script>
+    </head>
+<!-- !diff(1:1) - -->
+    <body>
+<!-- !diff(1:1) + -->
+    <body data-nickname="{{user.nickname}}">
+        <a href="/">Back to the main page</a>
+        <h1>The messages for user {{user.nickname}} ({{user.name}})</h1>
+        <table id="messages">
+```
+
+## step 18: the backend writes on the nickname channel
+
+almost done now: in this last-but-one step, we will have the backend write on the nickname channel
+
+so the `/api/messages` endpoint just goes on doing this once it is done:
+
+```python
+        socketio.emit(recipient.nickname, json.dumps(parameters, default=str))
+```
+
+the only thing remaining is for the frontend to use that data to reresh its page
+### 17 -> 18 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:5) -
+'''
+pass current nickname to the JS code
+use it to subscribe to that SocketIO channel
+'''
+VERSION = "17"
+# !diff(1:4) +
+"""
+backend notifies of new messages on the socketio channel
+"""
+VERSION = "18"
+import json
+from datetime import datetime as DateTime
+# !className separator
+..............................
+        parameters['recipient'] = dict(
+            id=recipient.id, name=recipient.name, email=recipient.email, nickname=recipient.nickname)
+        parameters['date'] = date
+# !diff(1:6) +
+        # we might have considered writing this
+        # socket.emit(recipient.nickname, json.dumps(parameters))
+        # however it won't work as-is because of the datetime filed which is not serializable
+        # it turns out flask knows how to serialize it, but for socketio we need to do it ourselves
+        # quick nd dirty way is this
+        socketio.emit(recipient.nickname, json.dumps(parameters, default=str))
+        return parameters
+    except Exception as exc:
+        return dict(error=f"{type(exc)}: {exc}"), 422
+```
+
+## step 19: finish it off
+
+the last ring of changes is concentrated in the JS code
+
+we need to do 2 things:
+
+- the code that used to add a newly sent message to the table is no longer relevant (we will receive this information through the channel)
+- but on the other hand we need to add messages to the table when we receive them through the channel
+
+so the changes are 
+
+- to factor out a function that we call `display_new_message()` - based on the previous code
+- and to call this function when we receive a message through the channel, like so
+
+```javascript
+    socket.on(nickname, (str) => display_new_message(JSON.parse(str)))
+```
+
+and this time the app is totally functional !
+### 18 -> 19 - changes in file: app.py
+
+```python app.py
+# !className separator
+..............................
+# !diff(1:4) -
+"""
+backend notifies of new messages on the socketio channel
+"""
+VERSION = "18"
+# !diff(1:4) +
+'''
+properly display incoming messages in the frontend
+'''
+VERSION = "19"
+import json
+from datetime import datetime as DateTime
+```
+
+### 18 -> 19 - changes in file: static/script.js
+
+```js script.js
+// !className separator
+..............................
+    console.log("connecting to the SocketIO backend")
+    const socket = io()
+    // we are storing the nickname in the body element
+// !diff(1:7) +
+    const display_new_message = (data) => {
+        // this is assume to be a an object (so JSON.parse before if necessary)
+        const {author, recipient, content, date} = data
+        const newRow = document.createElement('tr')
+        newRow.innerHTML = `<td>${date}</td><td>${author.nickname}</td><td>${recipient.nickname}</td><td>${content}</td>`
+        document.getElementById('messages').appendChild(newRow)
+    }
+    const nickname = document.body.dataset.nickname
+    socket.on('connect', () => {
+        console.log('Connected!')
+        socket.emit('connect-ack', {messages: `${nickname} has connected!`})
+    })
+    // so we can subscribe to that channel
+// !diff(1:4) -
+    socket.on(nickname, (data) => {
+        // the backend does not yet send anything to this channel, but anticipating a bit...
+        alert(`received ${data} from socketio on the ${nickname} channel`)
+    })
+// !diff(1:1) +
+    socket.on(nickname, (str) => display_new_message(JSON.parse(str)))
+    console.log(`subscribed to the ${nickname} channel`)
+    document.getElementById('send-form').addEventListener('submit',
+        async (event) => {
+// !className separator
+..............................
+                body: JSON.stringify(json)
+            })
+            .then((response) => response.json())
+// !diff(1:8) -
+            .then((data) => {
+                console.log(data)
+                // now we can diplay the author and recipient nicknames
+                const {author, recipient, content, date} = data
+                const newRow = document.createElement('tr')
+                newRow.innerHTML = `<td>${date}</td><td>${author.nickname}</td><td>${recipient.nickname}</td><td>${content}</td>`
+                document.getElementById('messages').appendChild(newRow)
+            })
+// !diff(1:1) +
+            .then(display_new_message)
+            .catch((error) => {
+                console.error('Error:', error)
+            })
+```
+
+
+
+## conclusion
+
+see the conclusion at the bottom of the [scrollycoding page](scrollycoding/)

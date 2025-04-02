@@ -1,7 +1,6 @@
 """
 the simplest possible hello world app
 """
-
 VERSION = "00"
 
 from flask import Flask

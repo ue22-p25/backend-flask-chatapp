@@ -1,10 +1,6 @@
 """
 /front/users serves a web page to see the users
-this comes with new files:
-- templates/users.html.j2
-- static/style.css
 """
-
 VERSION = "04"
 
 import json

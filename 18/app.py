@@ -1,7 +1,6 @@
 """
 backend notifies of new messages on the socketio channel
 """
-
 VERSION = "18"
 
 import json

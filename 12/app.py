@@ -1,7 +1,6 @@
 """
 /front/messages/<user_id> builds a html page to see messages
 """
-
 VERSION = "12"
 
 import json

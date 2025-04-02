@@ -1,7 +1,6 @@
 '''
 redirect the / route to /front/users
 '''
-
 VERSION = "05"
 
 import json

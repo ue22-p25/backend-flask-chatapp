@@ -3,7 +3,6 @@
 like author and recipient, and date
 see also changes in script.js
 '''
-
 VERSION = "15"
 
 import json

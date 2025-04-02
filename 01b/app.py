@@ -1,11 +1,9 @@
-""""
-create a table in the DB
-""""
-VERSION = "02b"
+"""
+add a /db/alive endpoint to check if the database is alive
+"""
+VERSION = "01b"
 
 from flask import Flask
-from flask import request
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
 
@@ -21,21 +19,6 @@ db_name = 'chat.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name
 # this variable, db, will be used for all SQLAlchemy commands
 db = SQLAlchemy(app)
-
-
-## define a table in the database
-
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    email = db.Column(db.String)
-    nickname = db.Column(db.String)
-
-
-# actually create the database (i.e. tables etc)
-with app.app_context():
-    db.create_all()
 
 
 @app.route('/')
@@ -58,15 +41,6 @@ def db_alive():
         error_text = "<p>The error:<br>" + str(e) + "</p>"
         hed = '<h1>Something is broken.</h1>'
         return hed + error_text
-
-
-# try it with
-"""
-http :5001/api/version
-"""
-@app.route('/api/version')
-def version():
-    return dict(version=VERSION)
 
 
 if __name__ == '__main__':

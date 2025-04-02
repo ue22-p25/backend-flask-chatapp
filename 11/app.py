@@ -1,7 +1,6 @@
 '''
 /api/messages/with/<user_id> returns users details
 '''
-
 VERSION = "11"
 
 import json

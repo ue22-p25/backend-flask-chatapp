@@ -2,7 +2,6 @@
 /front/messages/<user_id> keeps track of the message it just sent
 see also differences in script.js
 """
-
 VERSION = "14"
 
 import json

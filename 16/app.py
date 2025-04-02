@@ -1,7 +1,6 @@
 """
 app.py enables SocketIO & the front (HTML) messages page connects to the socket
 """
-
 VERSION = "16"
 
 import json

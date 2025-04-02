@@ -2,13 +2,13 @@ PEERREPO=../../ue22-p24-backend-flask-chatapp-hike
 
 function redo-1() {
     local out=$PEERREPO/app/singlecolumn/AUTO
-    python tocodehike.py chain-dirs ../?? > $out
+    python tocodehike.py chain-dirs ../[0-9]* > $out
     echo single column output written in $out
 }
 
 function redo-2() {
     local out=$PEERREPO/app/scrollycoding/AUTO
-    python tocodehike.py chain-dirs -s ../?? > $out
+    python tocodehike.py chain-dirs -s ../[0-9]* > $out
     echo double column output written in $out
 }
 

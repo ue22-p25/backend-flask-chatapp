@@ -1,7 +1,6 @@
 """
 new GET endpoint /api/users/<user_id> to retrieve a single user
 """
-
 VERSION = "06"
 
 import json

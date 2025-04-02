@@ -1,7 +1,7 @@
-"""
-new GET /api/messages/ to retrieve all messages
-"""
-VERSION = "08"
+''''
+new POST endpoint /api/messages to create a message
+''''
+VERSION = "07b"
 
 import json
 from datetime import datetime as DateTime
@@ -162,19 +162,6 @@ def create_message():
         return parameters
     except Exception as exc:
         return dict(error=f"{type(exc)}: {exc}"), 422
-
-
-# try it with
-"""
-http :5001/api/messages
-"""
-@app.route('/api/messages', methods=['GET'])
-def list_messages():
-    messages = Message.query.all()
-    return [dict(
-            id=message.id, content=message.content, date=message.date,
-            author_id=message.author_id, recipient_id=message.recipient_id)
-        for message in messages]
 
 
 

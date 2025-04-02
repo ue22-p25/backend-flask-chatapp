@@ -24,7 +24,7 @@ export default function Page() {
   const { intro, steps, outro } = parseRoot(Content, Schema)
   return (
     <main>
-      <Link href="/">Back</Link>
+      <Link href="/">Back to top</Link>
       <h1 className="mt-8">{intro.title}</h1>
       {intro.children}
       <SelectionProvider className="flex gap-4">

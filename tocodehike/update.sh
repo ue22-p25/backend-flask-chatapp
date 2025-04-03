@@ -31,4 +31,6 @@ function all() {
     fill
 }
 
-"$@"
+for subcommand in "$@"; do
+    $subcommand
+done

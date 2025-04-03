@@ -1,4 +1,4 @@
-## step 07: an endpoint to create messages
+## step 07b: an endpoint to create messages
 
 nothing new here as compared to users; except the minor point that the `date`
 column is not provided by the caller, but computed by the API at creation time

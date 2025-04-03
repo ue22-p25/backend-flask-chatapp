@@ -54,21 +54,6 @@ still in `app.py`
 so what we're saying here is, each time a message occurs on the `connect-ack` channel, the backend will print a message about that  
 we could have gone entirely without the `connect-ack` channel, but it is a good way to test that the connection is working
 
-### in the HTML template
-
-this is the place where we add the SocketIO client-side code into the mix; as always we use a `<script>` tag in `<head>` to do that; we picked a CDN for that
-
-### the JS code
-
-upon document loading, the JS code will 
-
-- create a connection to the server using `socket = io()`
-- and then define a callback function
-- that will trigger upon a `connect` event (this time this is a builtin name, as
-  opposed to the `connect-ack` channel we created earlier)
-- and so this is how the frontend will send an acknowledgment to the backend
-  upon successful connection
-
 ### expected behaviour
 
 all this means that, when the web page is loaded:

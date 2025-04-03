@@ -13,17 +13,6 @@ the arguments we had for users - the fact that we want the app to remain modular
 plus, on top of that, the approach here makes even more sense, in that the logic for
 retrieval this time is a little more complex, and **should not be duplicated**
 
-### the template
-
-the template is created with 2 variables:
-
-- `user`: the details about the user, that we get .. wait for it .. from the
-  `/api/users/<id>` endpoint
-- `messages`: the messages for the user, that we get from the
-  `/api/messages/with/<id>` endpoint
-
-in this first version we just display the messages, we'll add a prompt area later on
-
 ### other caveats
 
 at this point, the main default is, we don't see incoming messages as they are

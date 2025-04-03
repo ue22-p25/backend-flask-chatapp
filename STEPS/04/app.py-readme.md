@@ -2,12 +2,9 @@
 
 In this move we add in the mix the first seed of the app frontend
 
-### new files 
+### new files
 
-To this end we add the following files:
-
-- `static/style.css` - the CSS file; not much to say about that one..
-- `templates/users.html.j2` - the Jinja2 template for a welcome page, that lists known users
+a HTML template, and a CSS file, see below
 
 ### new endpoint
 
@@ -26,31 +23,6 @@ We need:
 
 - `render_template` to render the Jinja2 template;
 - `requests` to call the `/api/users` endpoint
-
-### templating
-
-the basics for Jinja2 templating is:
-
-- you compute one or several variables on the Python side - here e.g. we have `users` and `VERSION`
-- you pass them to the template with `render_template()`
-  ```python
-  render_template('users.html.j2', users=users, version=VERSION)
-  ```
-- and from then on you can access the variables in the template with the corresponding names - here `users` and `version`
-- for example, to display the version in the template, we use:
-  ```html
-  <h1>Welcome to the chat app (version {{ version }})</h1>
-  ```
-- Jinja also offers more advanced features, like loops and conditionals; observe how the template iterates over the `users` variable to create one HTML element per user
-  ```html
-    {% for user in users %}
-        <div class="user">
-        <h2>{{ user.name }}</h2>
-        <p>{{ user.email }}</p>
-        <p>{{ user.nickname }}</p>
-        </div>
-    {% endfor %}
-    ```
 
 ### keeping the app modular
 

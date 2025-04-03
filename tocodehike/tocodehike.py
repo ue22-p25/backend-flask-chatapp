@@ -42,16 +42,14 @@ def add_lang_index():
 add_lang_index()
 
 
-def md_title(title, *, level=2, first_changed_file=False):
+def md_title(title, *, level=2):
     """
     output a markdown title.
     """
     if not SCROLLY:
         print(f"{level*'#'} {title}\n")
-    elif not first_changed_file:
-        print(f"## !!steps {title}\n")
     else:
-        print(f"{level*'#'} {title}\n")
+        print(f"## !!steps {title}\n")
 
 
 def defaults(path, filename, lang, comment):
@@ -191,54 +189,57 @@ def onedir_diff(dir1, dir2):
     files2 = sorted(set(sp2.stdout.decode().splitlines()))
 
     # ignore README.md in the list of files
-    files1 = [f for f in files1 if 'README.md' not in f]
-    files2 = [f for f in files2 if 'README.md' not in f]
-
-    # do we have a readme in the target dir?
-    readme = path2 / 'README.md'
-    if readme.exists():
-        with readme.open() as f:
-            for line in f:
-                # need to tweak level 2 titles in scrolly mode
-                if SCROLLY and line.startswith('## '):
-                    line = line.replace('## ', '## !!steps ')
-                print(line, end="")
-            if not line.endswith('\n'):
-                print()
-
-    else:
-        md_title(f"changes from {path1} to {path2}")
-        print(f"WARNING: no README.md in {path2}", file=sys.stderr)
+    files1 = [f for f in files1 if not f.lower().endswith('readme.md')]
+    files2 = [f for f in files2 if not f.lower().endswith('readme.md')]
 
     same_files =  sorted(set(files1) & set(files2))
     new_files = sorted(set(files2) - set(files1))
     deleted_files = sorted(set(files1) - set(files2))
 
-    # a bit awkward: each changed file results in a new subsection
-    # except that in scrolly mode, we need a strict one-to-one mapping between
-    # subsections and code content
-    # so, the first changed file is used as the code for the readme text
-    # meaning, we need to treat the first changed file differently
-    first_changed_file = True
+    def handle_readme(path):
+        readme = path.parent / (path.name + '-readme.md')
+        if readme.exists():
+            with readme.open() as f:
+                for lineno, line in enumerate(f, 1):
+                    if lineno == 1:
+                        if not line.startswith('## '):
+                            print(f"!!! WARNING !!! README file {readme} does not start with ##", sys.stderr)
+                        else:
+                            if SCROLLY:
+                                line = line.replace('## ', '## !!steps ')
+                    print(line, end="")
+                if not line.endswith('\n'):
+                    print()
+        else:
+            print(f"!!! WARNING !!! File {readme} does not exist!", sys.stderr)
+            print(f"!!! WARNING !!! output likely broken !!!", sys.stderr)
+
+
+    # open the possibility to specify an order
+    def handle_same_file(file):
+        # if the files are equal, we don't need to show them
+        if not files_equal(path1 / file, path2 / file):
+            print(f"changes in file: {file}", file=sys.stderr)
+            md_title(f"{d1} -> {d2} - changes in file: {file}", level=3)
+            handle_readme(path2 / file)
+            onefile_diff(path1 / file, path2 / file)
+
+    def handle_new_file(file):
+        print(f"new file: {file2}", file=sys.stderr)
+        md_title(f"in {d2} - new file: {file2}", level=3)
+        handle_readme(path2 / file)
+        onefile_cat(path2 / file2, added=True)
+
+    md_title(f"changes in {d1} -> {d2}", level=2)
+    for file in same_files:
+        handle_same_file(file)
+    for file2 in new_files:
+        handle_new_file(file2)
 
     for file1 in deleted_files:
         print(f"deleted file: {file1}", file=sys.stderr)
         # ignore such cases for now, might mess with the scrolly logic
         # md_title(f"in {d2} - deleted file: {file1}", level=3)
-
-    for file in same_files:
-        # if the files are equal, we don't need to show them
-        if not files_equal(path1 / file, path2 / file):
-            print(f"changes in file: {file}", file=sys.stderr)
-            md_title(f"{d1} -> {d2} - changes in file: {file}", level=3, first_changed_file=first_changed_file)
-            onefile_diff(path1 / file, path2 / file)
-            first_changed_file = False
-
-    for file2 in new_files:
-        print(f"new file: {file2}", file=sys.stderr)
-        md_title(f"in {d2} - new file: {file2}", level=3, first_changed_file=first_changed_file)
-        onefile_cat(path2 / file2, added=True)
-        first_changed_file = False
 
 def chaindirs(paths):
     """

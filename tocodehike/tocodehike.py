@@ -42,11 +42,11 @@ def add_lang_index():
 add_lang_index()
 
 
-def md_title(title, *, level=2):
+def md_title(title, *, level=2, not_a_step=False):
     """
     output a markdown title.
     """
-    if not SCROLLY:
+    if not SCROLLY or not_a_step:
         print(f"{level*'#'} {title}\n")
     else:
         print(f"## !!steps {title}\n")
@@ -203,7 +203,7 @@ def onedir_diff(dir1, dir2):
                 for lineno, line in enumerate(f, 1):
                     if lineno == 1:
                         if not line.startswith('## '):
-                            print(f"!!! WARNING !!! README file {readme} does not start with ##", sys.stderr)
+                            print(f"!!! WARNING !!! README file {readme} does not start with ##", file=sys.stderr)
                         else:
                             if SCROLLY:
                                 line = line.replace('## ', '## !!steps ')
@@ -211,8 +211,8 @@ def onedir_diff(dir1, dir2):
                 if not line.endswith('\n'):
                     print()
         else:
-            print(f"!!! WARNING !!! File {readme} does not exist!", sys.stderr)
-            print(f"!!! WARNING !!! output likely broken !!!", sys.stderr)
+            print(f"!!! WARNING !!! File {readme} does not exist!", file=sys.stderr)
+            print(f"!!! WARNING !!! output likely broken !!!", file=sys.stderr)
 
 
     # open the possibility to specify an order
@@ -220,17 +220,17 @@ def onedir_diff(dir1, dir2):
         # if the files are equal, we don't need to show them
         if not files_equal(path1 / file, path2 / file):
             print(f"changes in file: {file}", file=sys.stderr)
-            md_title(f"{d1} -> {d2} - changes in file: {file}", level=3)
+            md_title(f"{d1} -> {d2} - changes in file: {file}", level=3, not_a_step=True)
             handle_readme(path2 / file)
             onefile_diff(path1 / file, path2 / file)
 
     def handle_new_file(file):
         print(f"new file: {file2}", file=sys.stderr)
-        md_title(f"in {d2} - new file: {file2}", level=3)
+        md_title(f"in {d2} - new file: {file2}", level=3, not_a_step=True)
         handle_readme(path2 / file)
         onefile_cat(path2 / file2, added=True)
 
-    md_title(f"changes in {d1} -> {d2}", level=2)
+    # md_title(f"changes in {d1} -> {d2}", level=2)
     for file in same_files:
         handle_same_file(file)
     for file2 in new_files:

@@ -8,6 +8,8 @@ the starter code in step 00 is the basic Flask `hello world` app
 !from ../app-00.py
 ```
 
+### 00 -> 01 - changes in file: app.py
+
 ## !!steps step 01: use a SQL database
 
 Let's start with empowering our Flask app with a SQL database.
@@ -19,8 +21,6 @@ This is only boilerplate code, but it's central to the rest of the steps.
 - We import SQLAlchemy, that provides a full SQL toolkit and Object Relational Mapper (ORM) for Python.
 - We configure Flask to use the DB located at `sqlite:///chat.db`
 - We create a new database object, and its `session` attribute, that will allow us to interact with said DB
-### 00 -> 01 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -62,6 +62,8 @@ if __name__ == '__main__':
     app.run()
 ```
 
+### 01 -> 01b - changes in file: app.py
+
 ## !!steps step 01b: first endpoint
 
 ### endpoints
@@ -95,8 +97,6 @@ http -I ://localhost:5000/db/alive
 ```bash
 alias http='\http -I'
 ```
-### 01 -> 01b - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -138,6 +138,8 @@ if __name__ == '__main__':
     app.run()
 ```
 
+### 01b -> 01c - changes in file: app.py
+
 ## !!steps step 01c: a /api/version endpoint
 
 ### endpoints
@@ -155,8 +157,6 @@ so that one can define a breaking change in the API, and still support the previ
 ```bash
 http ://localhost:5000/api/version
 ```
-### 01b -> 01c - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -189,6 +189,8 @@ if __name__ == '__main__':
     app.run()
 ```
 
+### 01c -> 02 - changes in file: app.py
+
 ## !!steps step 02: define a table in the DB
 
 ### the `User` table
@@ -211,8 +213,6 @@ server life cycle.
 
 **this is crucial** if we want to actually create the table (in DB words, this
   means we apply the schema to the database)
-
-### 01c -> 02 - changes in file: app.py
 
 ```python ! app.py
 # !className separator
@@ -257,6 +257,8 @@ with app.app_context():
 @app.route('/')
 ```
 
+### 02 -> 02b - changes in file: app.py
+
 ## !!steps step 02b: an endpoint to POST a new user
 
 ### rows creation
@@ -274,8 +276,6 @@ how to use SQLAlchemy to create a new row in the database:
 ### to try it out
 
 here again see the inline comments in the code for how to trigger the new endpoint
-### 02 -> 02b - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -323,6 +323,8 @@ if __name__ == '__main__':
     app.run()
 ```
 
+### 02b -> 03 - changes in file: app.py
+
 ## !!steps step 03: an endpoint to GET all users
 
 this is rather straightforward; now that we have a means to create users, we
@@ -358,8 +360,6 @@ admittedly rather tedious way of doing things
 ### to try it out
 
 you know what to do
-### 02b -> 03 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -397,16 +397,15 @@ if __name__ == '__main__':
     app.run()
 ```
 
+### 03 -> 04 - changes in file: app.py
+
 ## !!steps Step 04: serve a basic frontend
 
 In this move we add in the mix the first seed of the app frontend
 
-### new files 
+### new files
 
-To this end we add the following files:
-
-- `static/style.css` - the CSS file; not much to say about that one..
-- `templates/users.html.j2` - the Jinja2 template for a welcome page, that lists known users
+a HTML template, and a CSS file, see below
 
 ### new endpoint
 
@@ -425,31 +424,6 @@ We need:
 
 - `render_template` to render the Jinja2 template;
 - `requests` to call the `/api/users` endpoint
-
-### templating
-
-the basics for Jinja2 templating is:
-
-- you compute one or several variables on the Python side - here e.g. we have `users` and `VERSION`
-- you pass them to the template with `render_template()`
-  ```python
-  render_template('users.html.j2', users=users, version=VERSION)
-  ```
-- and from then on you can access the variables in the template with the corresponding names - here `users` and `version`
-- for example, to display the version in the template, we use:
-  ```html
-  <h1>Welcome to the chat app (version {{ version }})</h1>
-  ```
-- Jinja also offers more advanced features, like loops and conditionals; observe how the template iterates over the `users` variable to create one HTML element per user
-  ```html
-    {% for user in users %}
-        <div class="user">
-        <h2>{{ user.name }}</h2>
-        <p>{{ user.email }}</p>
-        <p>{{ user.nickname }}</p>
-        </div>
-    {% endfor %}
-    ```
 
 ### keeping the app modular
 
@@ -470,8 +444,6 @@ all running in different containers/computers
 Also note that this way of doing things is SSR (Server-Side rendering); relying
 on the API to implement this endpointmakes it more likely for us move to CSR
 (Client-Side rendering) in the future if need be.
-### 03 -> 04 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -528,7 +500,14 @@ if __name__ == '__main__':
     app.run()
 ```
 
-## !!steps in 04 - new file: static/style.css
+### in 04 - new file: static/style.css
+
+## !!steps some style
+
+just some style to be applied in the frontend
+
+this is a plain static file, it won't be subject to any processing, hence it
+goes in the `static` folder
 
 ```css ! style.css
 /* !diff(1:34) + */
@@ -568,7 +547,40 @@ if __name__ == '__main__':
 }
 ```
 
-## !!steps in 04 - new file: templates/users.html.j2
+### in 04 - new file: templates/users.html.j2
+
+## !!steps the HTML template
+
+this new file is a Jinja2 template, which is a templating engine for Python; it
+allows you to create HTML pages dynamically by embedding Python code within the
+HTML.
+
+the basics for Jinja2 templating is:
+
+- you compute one or several variables on the Python side - here e.g. we have
+  `users` and `VERSION`
+- you pass them to the template with `render_template()`
+  ```python
+  render_template('users.html.j2', users=users, version=VERSION)
+  ```
+- and from then on you can access the variables in the template with the
+  corresponding names - here `users` and `version`
+- for example, to display the version in the template, we use:
+  ```html
+  <h1>Welcome to the chat app (version {{ version }})</h1>
+  ```
+- Jinja also offers more advanced features, like loops and conditionals; observe
+  how the template iterates over the `users` variable to create one HTML element
+  per user
+  ```html
+    {% for user in users %}
+        <div class="user">
+        <h2>{{ user.name }}</h2>
+        <p>{{ user.email }}</p>
+        <p>{{ user.nickname }}</p>
+        </div>
+    {% endfor %}
+    ```
 
 ```html ! users.html.j2
 <!-- !diff(1:17) + -->
@@ -590,6 +602,8 @@ if __name__ == '__main__':
     </body>
 </html>
 ```
+
+### 04 -> 05 - changes in file: app.py
 
 ## !!steps step 05: how to redirect
 
@@ -613,8 +627,6 @@ in our case we just redirect the `/' URL to the `/front/users` URL:
 in particular about the HTTP codes, see:
 
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections
-### 04 -> 05 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -662,6 +674,8 @@ http :5001/api/users name="Charlie Chaplin" email="charlie@foo.com" nickname="ch
 def create_user():
 ```
 
+### 05 -> 06 - changes in file: app.py
+
 ## !!steps Step 06: add a /api/users/*id* endpoint
 
 A new endpoint to get the details of one specific user from their ID
@@ -670,8 +684,6 @@ Nothing new indeed, very similar to the `/api/users` endpoint, except that we
 use the `get()` method to retrieve the user by its primary key
 
 (and we still need to convert the `User` object to a regular Python dictionary)
-### 05 -> 06 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -710,6 +722,8 @@ def list_user(id):
 # for clarity we define our routes in the /front namespace
 ```
 
+### 06 -> 07 - changes in file: app.py
+
 ## !!steps step 07: a new table for storing messages
 
 In this very rustic app, a message is simply a text sent from one user (the author) to another one (the recipient)
@@ -728,8 +742,6 @@ declares as `ForeignKey` to the `id` column of the `users` table
 This is an intermediary step, and in a future step down the road we will improve
 this a bit, but it's helpful to understand how to deal with foreign keys in
 SQLAlchemy;
-
-### 06 -> 07 - changes in file: app.py
 
 ```python ! app.py
 # !className separator
@@ -766,7 +778,9 @@ class Message(db.Model):
 # actually create the database (i.e. tables etc)
 ```
 
-## !!steps step 07: an endpoint to create messages
+### 07 -> 07b - changes in file: app.py
+
+## !!steps step 07b: an endpoint to create messages
 
 nothing new here as compared to users; except the minor point that the `date`
 column is not provided by the caller, but computed by the API at creation time
@@ -826,8 +840,6 @@ create-users
 create-messages
 list-users
 ```
-### 07 -> 07b - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -878,13 +890,13 @@ def create_message():
 # for clarity we define our routes in the /front namespace
 ```
 
+### 07b -> 08 - changes in file: app.py
+
 ## !!steps step 08: an endpoint to retrieve messages
 
 super straightforward step, just retrieve all messages
 
 not very useful actually, but only for completeness.
-### 07b -> 08 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -921,6 +933,8 @@ def list_messages():
         for message in messages]
 ```
 
+### 08 -> 09 - changes in file: app.py
+
 ## !!steps step 09: get messages for a user
 
 more useful now, we need an API endpoint to retrieve messages for a given user  
@@ -950,8 +964,6 @@ we can use the exact same approach as for the users:
 in a practical app, we would probably need to return **BOTH** messsages that have the user as recipient **and as author**
 
 but let's not get ahead of ourselves, we will improve all this later on
-### 08 -> 09 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -996,6 +1008,8 @@ def list_messages_to(recipient_id):
 ## Frontend
 ```
 
+### 09 -> 10 - changes in file: app.py
+
 ## !!steps step 10: getting messages with a user
 
 first improvement to the previous step, we will now return messages **with** the user and not only **for** the user  
@@ -1003,8 +1017,6 @@ meaning that we need to write a little more elaborate filter, and look for messa
 
 which in logical terms amounts to doing a `OR` between the two conditions  
 hence the import of the `or_` function from SQLAlchemy, that will allow us to combine the two conditions
-### 09 -> 10 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -1059,6 +1071,8 @@ def list_messages_to(recipient_id):
             author_id=message.author_id,
 ```
 
+### 10 -> 11 - changes in file: app.py
+
 ## !!steps step 11: retrieving more details with messages
 
 this now is interesting; 
@@ -1096,8 +1110,6 @@ so in the `/api/messages/with/<id>` endpoint, we add a `author` and a
 `receiver` keys to the returned dict (and thus remove the `author_id` and
 `recipient_id` keys that can now be retrieved through the `author` and
 `recipient` relationships)
-### 10 -> 11 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -1149,6 +1161,8 @@ with app.app_context():
     ]
 ```
 
+### 11 -> 12 - changes in file: app.py
+
 ## !!steps step 12: a frontend to display messages
 
 just like we did earlier for users, it's time to build a frontend to display messages  
@@ -1164,24 +1178,11 @@ the arguments we had for users - the fact that we want the app to remain modular
 plus, on top of that, the approach here makes even more sense, in that the logic for
 retrieval this time is a little more complex, and **should not be duplicated**
 
-### the template
-
-the template is created with 2 variables:
-
-- `user`: the details about the user, that we get .. wait for it .. from the
-  `/api/users/<id>` endpoint
-- `messages`: the messages for the user, that we get from the
-  `/api/messages/with/<id>` endpoint
-
-in this first version we just display the messages, we'll add a prompt area later on
-
 ### other caveats
 
 at this point, the main default is, we don't see incoming messages as they are
 posted; the user needs to refresh the page to see new messages; a bit of
 patience...
-### 11 -> 12 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -1230,8 +1231,18 @@ if __name__ == '__main__':
     app.run()
 ```
 
-## !!steps in 12 - new file: templates/messages.html.j2
+### in 12 - new file: templates/messages.html.j2
 
+## !!steps the template
+
+the template is created with 2 variables:
+
+- `user`: the details about the user, that we get .. wait for it .. from the
+  `/api/users/<id>` endpoint
+- `messages`: the messages for the user, that we get from the
+  `/api/messages/with/<id>` endpoint
+
+in this first version we just display the messages, we'll add a prompt area later on
 ```html ! messages.html.j2
 <!-- !diff(1:29) + -->
 <!DOCTYPE html>
@@ -1265,6 +1276,8 @@ if __name__ == '__main__':
 </html>
 ```
 
+### 12 -> 13 - changes in file: app.py
+
 ## !!steps step 13: the frontend can send messages too
 
 it's nice to see the messages; but better still, we'd need to be able to send messages as well
@@ -1279,37 +1292,12 @@ in order to achieve this, we need:
 
 - simply makes a 3rd request to the API, to get the list of users
 
-### the template
-
-- injects the new JS script
-- adds a new form area to send messages, that has as many `<input>` fields as there are fields in a message, namely
-  - a `hidden` input with the `author_id` (the user id) - that won't change, but is required as part of the newly created message
-  - a `<select>` tag for the recipient
-  - a `<input>` tag for the content, typed as `text`
-
-### the new JS script
-
-- as we've learned in the frontend courses, the script arranges to execute itself when the page is loaded
-- at that time it binds the 'submit' event of the form to a function that will
-  - prevent the default behavior of the form (which would be to reload the page)
-  - get the values of the fields in the form
-  - and send them to the API, using a `POST` request
-
-**Note**: there actually is a default behaviour for a form submission event,
-which uses the `action` and `method` attributes of the form to determine where
-to send the data. However that default behaviour does not support JSON encoding,
-this is the only reason why we need to bother with the JS script at that point.  
-(we will take advantage of our custom script in the next steps anyway, so it's
-no regret)
-
 ### still missing
 
 and fixed in the next step:
 
 the page does not refresh after sending a message; i.e. the new message is not
 displayed in the list of messages
-### 12 -> 13 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -1353,8 +1341,15 @@ from datetime import datetime as DateTime
     )
 ```
 
-## !!steps 12 -> 13 - changes in file: templates/messages.html.j2
+### 12 -> 13 - changes in file: templates/messages.html.j2
 
+## !!steps the template
+
+- injects the new JS script
+- adds a new form area to send messages, that has as many `<input>` fields as there are fields in a message, namely
+  - a `hidden` input with the `author_id` (the user id) - that won't change, but is required as part of the newly created message
+  - a `<select>` tag for the recipient
+  - a `<input>` tag for the content, typed as `text`
 ```html ! messages.html.j2
 <!-- !className separator -->
 ..............................
@@ -1388,8 +1383,22 @@ from datetime import datetime as DateTime
 </html>
 ```
 
-## !!steps in 13 - new file: static/script.js
+### in 13 - new file: static/script.js
 
+## !!steps the new JS script
+
+- as we've learned in the frontend courses, the script arranges to execute itself when the page is loaded
+- at that time it binds the 'submit' event of the form to a function that will
+  - prevent the default behavior of the form (which would be to reload the page)
+  - get the values of the fields in the form
+  - and send them to the API, using a `POST` request
+
+**Note**: there actually is a default behaviour for a form submission event,
+which uses the `action` and `method` attributes of the form to determine where
+to send the data. However that default behaviour does not support JSON encoding,
+this is the only reason why we need to bother with the JS script at that point.  
+(we will take advantage of our custom script in the next steps anyway, so it's
+no regret)
 ```js ! script.js
 // !diff(1:19) +
 // surprisingly there is no way to tell a <form> that it should submit as JSON
@@ -1413,6 +1422,8 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     })
 ```
 
+### 13 -> 14 - changes in file: app.py
+
 ## !!steps step 14: also display newly created message
 
 upon successful creation of a message, the API returns the message details so,
@@ -1421,20 +1432,10 @@ we can use that to display the message in the frontend
 in the mix, we can also take care of any error that may occur, and inform the
 user (actually in this rustic app we just log in the console)
 
-### the JS script
-
-we just need to extend the JS script to handle the response from the API; for
-that
-- we improve on the sequence of `.then()` calls
-- if the response is a success, we create a new row in the messages table
-- and if not we use a `.catch()` to log the error in the console
-
 ### the caveats
 
 at this point in time, the data returned by the API about the newly created
 message only contains user ids, not the user names
-### 13 -> 14 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -1453,8 +1454,15 @@ import json
 from datetime import datetime as DateTime
 ```
 
-## !!steps 13 -> 14 - changes in file: static/script.js
+### 13 -> 14 - changes in file: static/script.js
 
+## !!steps the JS script
+
+we just need to extend the JS script to handle the response from the API; for
+that
+- we improve on the sequence of `.then()` calls
+- if the response is a success, we create a new row in the messages table
+- and if not we use a `.catch()` to log the error in the console
 ```js ! script.js
 // !className separator
 ..............................
@@ -1479,6 +1487,8 @@ from datetime import datetime as DateTime
     })
 ```
 
+### 14 -> 15 - changes in file: app.py
+
 ## !!steps step 15: display nicknames in newly created messages
 
 to be able to display the nicknames of the users in the newly created messages,
@@ -1497,8 +1507,6 @@ here we are not in a performance context, and we want to keep things simple
 now the app works reasonably fine as far as sending messages is concerned  
 but it still sucks in terms of receiving messages; we have no simple way to be
 made aware of incoming messages
-### 14 -> 15 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -1544,8 +1552,11 @@ from datetime import datetime as DateTime
         return dict(error=f"{type(exc)}: {exc}"), 422
 ```
 
-## !!steps 14 -> 15 - changes in file: static/script.js
+### 14 -> 15 - changes in file: static/script.js
 
+## !!steps the JS script
+
+in this version, we now receive full user info, so we need to tweak the JS accordingly
 ```js ! script.js
 // !className separator
 ..............................
@@ -1568,6 +1579,8 @@ from datetime import datetime as DateTime
             })
             .catch((error) => {
 ```
+
+### 15 -> 16 - changes in file: app.py
 
 ## !!steps step 16: pouring SocketIO into the mix
 
@@ -1625,21 +1638,6 @@ still in `app.py`
 so what we're saying here is, each time a message occurs on the `connect-ack` channel, the backend will print a message about that  
 we could have gone entirely without the `connect-ack` channel, but it is a good way to test that the connection is working
 
-### in the HTML template
-
-this is the place where we add the SocketIO client-side code into the mix; as always we use a `<script>` tag in `<head>` to do that; we picked a CDN for that
-
-### the JS code
-
-upon document loading, the JS code will 
-
-- create a connection to the server using `socket = io()`
-- and then define a callback function
-- that will trigger upon a `connect` event (this time this is a builtin name, as
-  opposed to the `connect-ack` channel we created earlier)
-- and so this is how the frontend will send an acknowledgment to the backend
-  upon successful connection
-
 ### expected behaviour
 
 all this means that, when the web page is loaded:
@@ -1651,8 +1649,6 @@ all this means that, when the web page is loaded:
 
 of course all this traffic is purely for educational purposes, and is not
 required for the app to work properly
-### 15 -> 16 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -1707,8 +1703,18 @@ if __name__ == '__main__':
     socketio.run(app)
 ```
 
-## !!steps 15 -> 16 - changes in file: static/script.js
+### 15 -> 16 - changes in file: static/script.js
 
+## !!steps the JS code
+
+upon document loading, the JS code will 
+
+- create a connection to the server using `socket = io()`
+- and then define a callback function
+- that will trigger upon a `connect` event (this time this is a builtin name, as
+  opposed to the `connect-ack` channel we created earlier)
+- and so this is how the frontend will send an acknowledgment to the backend
+  upon successful connection
 ```js ! script.js
 // !className separator
 ..............................
@@ -1728,8 +1734,12 @@ document.addEventListener('DOMContentLoaded', async (event) => {
             // turn off default form behaviour
 ```
 
-## !!steps 15 -> 16 - changes in file: templates/messages.html.j2
+### 15 -> 16 - changes in file: templates/messages.html.j2
 
+## !!steps the HTML template
+
+this is the place where we add the SocketIO client-side code into the mix; as
+always we use a `<script>` tag in `<head>` to do that; we picked a CDN for that
 ```html ! messages.html.j2
 <!-- !className separator -->
 ..............................
@@ -1750,6 +1760,8 @@ document.addEventListener('DOMContentLoaded', async (event) => {
         <h1>The messages for user {{user.nickname}} ({{user.name}})</h1>
 ```
 
+### 16 -> 17 - changes in file: app.py
+
 ## !!steps step 17: subscribe to the nickname channel
 
 our next move is to subscribe to the nickname channel  
@@ -1760,40 +1772,8 @@ we have 2 options here:
 1. make the JS code a template, and instantiate it with the nickname
 1. pass the nickname to the JS code **through the HTML tree**
 
-### change in the template
-
-actually, the first option is a little awkward, there is no need to make the JS
-code a template;
-
-instead we can simply attach the nickname in the HTML tree; and there is a
-standard practice for that, which is to add a **data attribute** to the HTML
-element; and since this is of interest to the whole tree, we pick the `<body>`
-element for that purpose
-
-hence this line in the HTML template:
-
-```html
-<body data-nickname="{{ user.nickname }}">
-```
-
-### change in the JS code
-
-from then on, the nickname becomes accessible in the JS code, thanks to this
-line
-
-```javascript
-    const nickname = document.body.dataset.nickname
-```
-
-and from there, we can simply subscribe to the nickname channel, using the
-`socket.on()` method like before
-
-### what's left then ?
-
-but of course this version is not functional yet, as nobody writes on that
-channel yet...
-### 16 -> 17 - changes in file: app.py
-
+of course this version is not functional yet, as nobody writes on that
+channel yet... but we'll fix it later
 ```python ! app.py
 # !className separator
 ..............................
@@ -1812,8 +1792,19 @@ import json
 from datetime import datetime as DateTime
 ```
 
-## !!steps 16 -> 17 - changes in file: static/script.js
+### 16 -> 17 - changes in file: static/script.js
 
+## !!steps change in the JS code
+
+from then on, the nickname becomes accessible in the JS code, thanks to this
+line
+
+```javascript
+    const nickname = document.body.dataset.nickname
+```
+
+and from there, we can simply subscribe to the nickname channel, using the
+`socket.on()` method like before
 ```js ! script.js
 // !className separator
 ..............................
@@ -1842,8 +1833,23 @@ document.addEventListener('DOMContentLoaded', async (event) => {
             // turn off default form behaviour
 ```
 
-## !!steps 16 -> 17 - changes in file: templates/messages.html.j2
+### 16 -> 17 - changes in file: templates/messages.html.j2
 
+## !!steps change in the template
+
+actually, the first option is a little awkward, there is no need to make the JS
+code a template;
+
+instead we can simply attach the nickname in the HTML tree; and there is a
+standard practice for that, which is to add a **data attribute** to the HTML
+element; and since this is of interest to the whole tree, we pick the `<body>`
+element for that purpose
+
+hence this line in the HTML template:
+
+```html
+<body data-nickname="{{ user.nickname }}">
+```
 ```html ! messages.html.j2
 <!-- !className separator -->
 ..............................
@@ -1858,6 +1864,8 @@ document.addEventListener('DOMContentLoaded', async (event) => {
         <table id="messages">
 ```
 
+### 17 -> 18 - changes in file: app.py
+
 ## !!steps step 18: the backend writes on the nickname channel
 
 almost done now: in this last-but-one step, we will have the backend write on the nickname channel
@@ -1869,8 +1877,6 @@ so the `/api/messages` endpoint just goes on doing this once it is done:
 ```
 
 the only thing remaining is for the frontend to use that data to reresh its page
-### 17 -> 18 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -1904,27 +1910,13 @@ from datetime import datetime as DateTime
         return dict(error=f"{type(exc)}: {exc}"), 422
 ```
 
+### 18 -> 19 - changes in file: app.py
+
 ## !!steps step 19: finish it off
 
 the last ring of changes is concentrated in the JS code
 
-we need to do 2 things:
-
-- the code that used to add a newly sent message to the table is no longer relevant (we will receive this information through the channel)
-- but on the other hand we need to add messages to the table when we receive them through the channel
-
-so the changes are 
-
-- to factor out a function that we call `display_new_message()` - based on the previous code
-- and to call this function when we receive a message through the channel, like so
-
-```javascript
-    socket.on(nickname, (str) => display_new_message(JSON.parse(str)))
-```
-
 and this time the app is totally functional !
-### 18 -> 19 - changes in file: app.py
-
 ```python ! app.py
 # !className separator
 ..............................
@@ -1942,8 +1934,23 @@ import json
 from datetime import datetime as DateTime
 ```
 
-## !!steps 18 -> 19 - changes in file: static/script.js
+### 18 -> 19 - changes in file: static/script.js
 
+## !!steps JavaScript code
+
+we need to do 2 things:
+
+- the code that used to add a newly sent message to the table is no longer relevant (we will receive this information through the channel)
+- but on the other hand we need to add messages to the table when we receive them through the channel
+
+so the changes are 
+
+- to factor out a function that we call `display_new_message()` - based on the previous code
+- and to call this function when we receive a message through the channel, like so
+
+```javascript
+    socket.on(nickname, (str) => display_new_message(JSON.parse(str)))
+```
 ```js ! script.js
 // !className separator
 ..............................

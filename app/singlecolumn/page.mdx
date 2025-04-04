@@ -987,12 +987,13 @@ from datetime import datetime as DateTime
 ..............................
             author_id=message.author_id, recipient_id=message.recipient_id)
         for message in messages]
-# !diff(1:21) +
+# !diff(1:22) +
 
 # try it with
 """
 http :5001/api/messages/with/1
 """
+
 @app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
 def list_messages_to(recipient_id):
     """"
@@ -1046,7 +1047,6 @@ from sqlalchemy.sql import or_
 app = Flask(__name__)
 # !className separator
 ..............................
-"""
 @app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
 def list_messages_to(recipient_id):
 # !diff(1:5) -
@@ -1139,6 +1139,16 @@ from datetime import datetime as DateTime
     recipient = db.relationship('User', foreign_keys=[recipient_id], backref='received_messages')
 # actually create the database (i.e. tables etc)
 with app.app_context():
+# !className separator
+..............................
+"""
+http :5001/api/messages/with/1
+"""
+# !diff(1:1) -
+
+@app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
+def list_messages_to(recipient_id):
+    """
 # !className separator
 ..............................
             Message.recipient_id==recipient_id,

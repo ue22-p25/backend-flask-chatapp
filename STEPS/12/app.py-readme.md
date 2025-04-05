@@ -1,4 +1,4 @@
-## step 12: a frontend to display messages
+## a frontend to display messages
 
 just like we did earlier for users, it's time to build a frontend to display messages  
 this comes in two parts:

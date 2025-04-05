@@ -1,4 +1,4 @@
-## Step 06: add a /api/users/*id* endpoint
+## add a /api/users/*id* endpoint
 
 A new endpoint to get the details of one specific user from their ID
 

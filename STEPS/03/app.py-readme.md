@@ -1,4 +1,4 @@
-## step 03: an endpoint to GET all users
+## an endpoint to GET all users
 
 this is rather straightforward; now that we have a means to create users, we
 need a way to get them back

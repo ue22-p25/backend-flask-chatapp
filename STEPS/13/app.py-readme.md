@@ -1,4 +1,4 @@
-## step 13: the frontend can send messages too
+## the frontend can send messages too
 
 it's nice to see the messages; but better still, we'd need to be able to send messages as well
 

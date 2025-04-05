@@ -1,4 +1,4 @@
-## step 09: get messages for a user
+## get messages for a user
 
 more useful now, we need an API endpoint to retrieve messages for a given user  
 like always we will refer to the user **by its primary key**, so that is the

@@ -1,4 +1,4 @@
-## step 01b: first endpoint
+## first endpoint
 
 ### endpoints
 

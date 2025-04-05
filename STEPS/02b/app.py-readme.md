@@ -1,4 +1,4 @@
-## step 02b: an endpoint to POST a new user
+## an endpoint to POST a new user
 
 ### rows creation
 

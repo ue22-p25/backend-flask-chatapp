@@ -1,4 +1,4 @@
-## step 19: finish it off
+## finish it off
 
 the last ring of changes is concentrated in the JS code
 

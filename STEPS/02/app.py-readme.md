@@ -1,4 +1,4 @@
-## step 02: define a table in the DB
+## define a table in the DB
 
 ### the `User` table
 

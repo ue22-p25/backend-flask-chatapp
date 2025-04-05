@@ -1,4 +1,4 @@
-## step 01c: a /api/version endpoint
+## a /api/version endpoint
 
 ### endpoints
 

@@ -1,4 +1,4 @@
-## step 11: retrieving more details with messages
+## retrieving more details with messages
 
 this now is interesting; 
 

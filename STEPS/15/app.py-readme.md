@@ -1,4 +1,4 @@
-## step 15: display nicknames in newly created messages
+## display nicknames in newly created messages
 
 to be able to display the nicknames of the users in the newly created messages,
 we need to slightly tweak our `/api/messages` endpoint  

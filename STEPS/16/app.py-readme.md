@@ -1,4 +1,4 @@
-## step 16: pouring SocketIO into the mix
+## pouring SocketIO into the mix
 
 to make the app more reactive, we will use SocketIO, so the backend can notify
 the frontend of incoming messages

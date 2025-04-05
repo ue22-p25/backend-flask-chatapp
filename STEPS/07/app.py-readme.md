@@ -1,4 +1,4 @@
-## step 07: a new table for storing messages
+## a new table for storing messages
 
 In this very rustic app, a message is simply a text sent from one user (the author) to another one (the recipient)
 

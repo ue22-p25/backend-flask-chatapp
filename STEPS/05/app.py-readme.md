@@ -1,4 +1,4 @@
-## step 05: how to redirect
+## how to redirect
 
 Nothing crucial here, but an opportunity to show how to redirect HTTP traffic
 

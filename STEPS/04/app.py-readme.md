@@ -1,4 +1,4 @@
-## Step 04: serve a basic frontend
+## serve a basic frontend
 
 In this move we add in the mix the first seed of the app frontend
 

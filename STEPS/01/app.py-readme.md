@@ -1,4 +1,4 @@
-## step 01: use a SQL database
+## use a SQL database
 
 Let's start with empowering our Flask app with a SQL database.
 

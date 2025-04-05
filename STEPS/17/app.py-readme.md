@@ -1,4 +1,4 @@
-## step 17: subscribe to the nickname channel
+## subscribe to the nickname channel
 
 our next move is to subscribe to the nickname channel  
 but wait, the JS code currently is static, and has no access to the nickname

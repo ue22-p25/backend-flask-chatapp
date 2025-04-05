@@ -1,4 +1,4 @@
-## step 14: also display newly created message
+## also display newly created message
 
 upon successful creation of a message, the API returns the message details so,
 we can use that to display the message in the frontend

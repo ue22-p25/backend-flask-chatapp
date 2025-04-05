@@ -1,4 +1,4 @@
-## step 18: the backend writes on the nickname channel
+## the backend writes on the nickname channel
 
 almost done now: in this last-but-one step, we will have the backend write on the nickname channel
 

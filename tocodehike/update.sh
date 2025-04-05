@@ -31,6 +31,17 @@ function all() {
     fill
 }
 
+function test() {
+    local TESTS="0[012]"
+    local out=$APP/singlecolumn/AUTO
+    python $BIN/tocodehike.py chain-dirs $TESTS > $out
+    echo single column output written in $out
+    local out=$APP/scrollycoding/AUTO
+    python $BIN/tocodehike.py chain-dirs -s $TESTS > $out
+    echo single column output written in $out
+    fill
+}
+
 for subcommand in "$@"; do
     $subcommand
 done

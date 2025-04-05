@@ -42,16 +42,6 @@ def add_lang_index():
 add_lang_index()
 
 
-def md_title(title, *, level=2, not_a_step=False):
-    """
-    output a markdown title.
-    """
-    if not SCROLLY or not_a_step:
-        print(f"{level*'#'} {title}\n")
-    else:
-        print(f"## !!steps {title}\n")
-
-
 def defaults(path, filename, lang, comment):
     """
     Assign defaults for filename, lang, and comment based on the file extension.
@@ -196,18 +186,34 @@ def onedir_diff(dir1, dir2):
     new_files = sorted(set(files2) - set(files1))
     deleted_files = sorted(set(files1) - set(files2))
 
-    def handle_readme(path):
+    def handle_first_line(line, name, d1, d2):
+        if not line.startswith('## '):
+            print(f"!!! WARNING !!! README file {readme} does not start with ##", file=sys.stderr)
+            title = "!!! MISSING TITLE in {d2}/{name} !!!"
+        else:
+            title = line[3:].strip()
+        if SCROLLY:
+            print(f"## !!steps step {d2}: {title}")
+        else:
+            print(f"## step {d2}: {title}")
+
+        if d1:
+            print(f"### {d1} -> {d2} - changes in {name}")
+        else:
+            print(f"### new in {d2} - file {name}")
+
+    def handle_readme(path, *, new_dir, old_dir=None):
+        """
+        d1=None mean it's a new file in d2
+        """
         readme = path.parent / (path.name + '-readme.md')
         if readme.exists():
             with readme.open() as f:
                 for lineno, line in enumerate(f, 1):
                     if lineno == 1:
-                        if not line.startswith('## '):
-                            print(f"!!! WARNING !!! README file {readme} does not start with ##", file=sys.stderr)
-                        else:
-                            if SCROLLY:
-                                line = line.replace('## ', '## !!steps ')
-                    print(line, end="")
+                        handle_first_line(line, path.name, old_dir, new_dir)
+                    else:
+                        print(line, end="")
                 if not line.endswith('\n'):
                     print()
         else:
@@ -220,14 +226,14 @@ def onedir_diff(dir1, dir2):
         # if the files are equal, we don't need to show them
         if not files_equal(path1 / file, path2 / file):
             print(f"changes in file: {file}", file=sys.stderr)
-            md_title(f"{d1} -> {d2} - changes in file: {file}", level=3, not_a_step=True)
-            handle_readme(path2 / file)
+            # md_title(f"{d1} -> {d2} - changes in file: {file}", level=3, not_a_step=True)
+            handle_readme(path2 / file, old_dir=d1, new_dir=d2)
             onefile_diff(path1 / file, path2 / file)
 
     def handle_new_file(file):
         print(f"new file: {file2}", file=sys.stderr)
-        md_title(f"in {d2} - new file: {file2}", level=3, not_a_step=True)
-        handle_readme(path2 / file)
+        # md_title(f"in {d2} - new file: {file2}", level=3, not_a_step=True)
+        handle_readme(path2 / file, new_dir=d2)
         onefile_cat(path2 / file2, added=True)
 
     # md_title(f"changes in {d1} -> {d2}", level=2)

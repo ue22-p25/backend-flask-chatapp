@@ -31,8 +31,17 @@ h2 {
 h3 {
   /* background-color: rgb(225, 148, 32); */
   padding: 0 5px;
-  border-radius: 3px;
+  border-radius: 6px;
   &::before {
     content: " ✅ ";
+  }
+}
+
+h2+div>h3:first-child, h2+h3 {
+    background-color: #b6538e;
+  opacity: 0.8;
+  border-radius: 3px;
+  &::before {
+    content: "🚀 ";
   }
 }

@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+/* 
+ * tocodehike separate diff chunks with a line that reads
+ * # !className separator
+ * ......
+ * this way if the class is not present, the separator will wtill show somehow
+ */
+
+.separator {
+  border-radius: 2px;
+  border: 1px solid #767d3b;
+  height: 5px;
+  margin: 0.5rem 0;
+
+  /* but when the class is present we can hide the line that has all the dots */
+  > * {
+    display: none;
+  }
+}
+
+h2 {
+  background-color: #767d3b;
+  padding: 20px 50px;
+  border-radius: 5px;
+}
+
+h3 {
+  /* background-color: rgb(225, 148, 32); */
+  padding: 0 5px;
+  border-radius: 6px;
+  &::before {
+    content: " ✅ ";
+  }
+}
+
+h2+div>h3:first-child, h2+h3 {
+    background-color: #b6538e;
+  opacity: 0.8;
+  border-radius: 3px;
+  &::before {
+    content: "🚀 ";
+  }
+}

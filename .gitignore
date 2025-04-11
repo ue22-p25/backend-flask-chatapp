@@ -40,3 +40,7 @@ AUTO
 __pycache__
 chat.db
 app-??*.py
+
+# the steps
+steps-repo
+.steps

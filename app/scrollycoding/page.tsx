@@ -28,7 +28,8 @@ export default function Page() {
       <h1 className="mt-8">{intro.title}</h1>
       {intro.children}
       <SelectionProvider className="flex gap-4">
-        <div className="flex-1 mt-32 mb-[90vh] ml-2 prose prose-invert">
+        {/* <div className="flex-1 mt-32 mb-[90vh] ml-2 prose prose-invert"> */}
+        <div className="flex-1 mb-[90vh] prose prose-invert">
           {steps.map((step, i) => (
             <Selectable
               key={i}
@@ -41,7 +42,8 @@ export default function Page() {
             </Selectable>
           ))}
         </div>
-        <div className="w-[40vw] max-w-xl bg-zinc-900">
+    {/* <div className="w-[40vw] max-w-xl bg-zinc-900"> */}
+        <div className="max-w-7xl bg-zinc-900">
           <div className="top-4 sticky overflow-auto">
             <Selection
               from={steps.map((step, i) => (

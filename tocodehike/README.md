@@ -1,4 +1,4 @@
-# managing a step by step rollout
+# managing a step by step rollout (steps.py)
 
 ## 2 representations
 
@@ -25,7 +25,7 @@ default layout is:
 - both representations are expected to be in the **same folder**
 - with the folder structure - when present - is in `./steps`
 
-**for conveninence only** (mostly development)  
+**for convenience only** (mostly development)  
 the commands allow to specify a different input or output folder (the -i and -o options)  
 this is hopefully only needed when bootstrapping, and not in production
 
@@ -79,13 +79,25 @@ steps.py diff-branches <git_repo> <branch1> <branch2>
 as of now this is relevant only if both branches have the same steps (no
 re-syncing yet
 
+## from folders to codehike (tocodehike,py)
 
-### produce the codehike input
-
-NOT INTEGRATED YET
-
-```bash
-steps.py tocodehike <git_repo> <branch> <output_folder>
+```
+./tocodehike.py chain-dirs [--scolly] steps-repo/.steps/*
 ```
 
-to be done later on - might not belong here at all
+will write on stdout the codehike input  
+see `--help` to see the other lower-level subcommands
+
+# producing the codehike input
+
+## redo.sh
+
+```
+redo.sh all
+```
+
+will
+- clone the upstream repo `ue22-p24/flask-chatapp-steps` under `tocodehike/steps-repo`
+- run the `tofolders` command above to explode this repo into a folder
+- invoke `tocodehike.py` to produce the codehike input
+- run `fillauto.py` to fill the .j2 templates and produce the final `.mdx` input to codehike

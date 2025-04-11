@@ -6,7 +6,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "npx serve@latest out",
-    "surge": "npx surge out/ backend-chatapp.surge.sh",
     "lint": "next lint"
   },
   "dependencies": {

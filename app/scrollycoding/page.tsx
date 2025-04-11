@@ -44,8 +44,8 @@ export default function Page() {
         <div className="w-[40vw] max-w-xl bg-zinc-900">
           <div className="top-4 sticky overflow-auto">
             <Selection
-              from={steps.map((step) => (
-                <Code codeblock={step.code} />
+              from={steps.map((step, i) => (
+                <Code codeblock={step.code} key={i}/>
               ))}
             />
           </div>

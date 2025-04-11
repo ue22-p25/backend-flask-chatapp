@@ -23,42 +23,28 @@ This is only boilerplate code, but it's central to the rest of the steps.
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-"""
-the simplest possible hello world app
-"""
+# !diff(1:1) -
 VERSION = "00"
-# !diff(1:5) +
-'''
-connect to a SQL (sqlite) database
-use SQLAlchemy to do so
-'''
+# !diff(1:1) +
 VERSION = "01"
 from flask import Flask
-# !diff(1:2) +
+# !diff(1:3) +
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
+
 ## usual Flask initilization
 app = Flask(__name__)
-# !diff(1:11) +
+# !diff(1:8) +
 
 ## DB declaration
 
 # filename where to store stuff (sqlite is file-based)
-db_name = 'chat.db'
-# how do we connect to the database ?
-# here we say it's by looking in a file named chat.db
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
 # this variable, db, will be used for all SQLAlchemy commands
 db = SQLAlchemy(app)
 
 @app.route('/')
 def hello_world():
-    return f'hello, this is a chat app! (version {VERSION})'
-# !diff(1:1) +
-
-if __name__ == '__main__':
-    app.run()
 ```
 
 ## !!steps step 01b: first endpoint
@@ -75,7 +61,7 @@ This triggers the minimal SQL code, just to make sure we can reach the DB; think
 in all the rest we assume you run the Flask server on port 5001  
 
 ```bash
-http ://localhost:5000/db/alive
+http ://localhost:5001/db/alive
 ```
 
 ### Note for windows users
@@ -87,7 +73,7 @@ It seems that the `http` command, when run on "Git Bash" for Windows, triggers a
 In that case, take the message at face value, and add the `-I` (shorthand for `--ignore-stdin`) option to the command:
 
 ```bash
-http -I ://localhost:5000/db/alive
+http -I ://localhost:5001/db/alive
 ```
 
 **Tip**: to continue using the same sentence (i.e. without the `-I`), you might be able to trick bash and define an alias
@@ -98,19 +84,11 @@ alias http='\http -I'
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:5) -
-'''
-connect to a SQL (sqlite) database
-use SQLAlchemy to do so
-'''
+# !diff(1:1) -
 VERSION = "01"
-# !diff(1:4) +
-"""
-add a /db/alive endpoint to check if the database is alive
-"""
+# !diff(1:1) +
 VERSION = "01b"
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 # !className separator
 ..............................
     return f'hello, this is a chat app! (version {VERSION})'
@@ -152,23 +130,16 @@ so that one can define a breaking change in the API, and still support the previ
 ### to try it out
 
 ```bash
-http ://localhost:5000/api/version
+http ://localhost:5001/api/version
 ```
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-"""
-add a /db/alive endpoint to check if the database is alive
-"""
+# !diff(1:1) -
 VERSION = "01b"
-# !diff(1:4) +
-'''
-add a /api/version endpoint to check the app version
-'''
+# !diff(1:1) +
 VERSION = "01c"
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 # !className separator
 ..............................
         return hed + error_text
@@ -213,25 +184,14 @@ server life cycle.
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-'''
-add a /api/version endpoint to check the app version
-'''
+# !diff(1:1) -
 VERSION = "01c"
-# !diff(1:4) +
-""""
-create a table in the DB
-""""
-VERSION = "02b"
+# !diff(1:1) +
+VERSION = "02"
 from flask import Flask
-# !diff(1:2) +
-from flask import request
-
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import text
 # !className separator
 ..............................
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
 # this variable, db, will be used for all SQLAlchemy commands
 db = SQLAlchemy(app)
 # !diff(1:15) +
@@ -274,18 +234,17 @@ here again see the inline comments in the code for how to trigger the new endpoi
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-""""
-create a table in the DB
-""""
-VERSION = "02b"
-# !diff(1:4) +
-"""
-add a /api/users POST endpoint to create a user
-"""
+# !diff(1:1) -
 VERSION = "02"
+# !diff(1:3) +
+VERSION = "02b"
+
+import json
 from flask import Flask
+# !diff(1:1) +
 from flask import request
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import text
 # !className separator
 ..............................
     return dict(version=VERSION)
@@ -357,20 +316,11 @@ you know what to do
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-"""
-add a /api/users POST endpoint to create a user
-"""
-VERSION = "02"
-# !diff(1:6) +
-'''
-add a /api/users GET endpoint to list users
-'''
+# !diff(1:1) -
+VERSION = "02b"
+# !diff(1:1) +
 VERSION = "03"
-
 import json
-from flask import Flask
-from flask import request
 # !className separator
 ..............................
         return dict(error=f"{type(exc)}: {exc}"), 422
@@ -440,15 +390,9 @@ on the API to implement this endpointmakes it more likely for us move to CSR
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-'''
-add a /api/users GET endpoint to list users
-'''
+# !diff(1:1) -
 VERSION = "03"
-# !diff(1:4) +
-"""
-/front/users serves a web page to see the users
-"""
+# !diff(1:1) +
 VERSION = "04"
 import json
 # !diff(1:1) +
@@ -620,15 +564,9 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-"""
-/front/users serves a web page to see the users
-"""
+# !diff(1:1) -
 VERSION = "04"
-# !diff(1:4) +
-'''
-redirect the / route to /front/users
-'''
+# !diff(1:1) +
 VERSION = "05"
 import json
 import requests
@@ -652,16 +590,6 @@ def hello_world():
     # actually this is just a rsponse with a 301 HTTP code
     return redirect('/front/users')
 # try it with
-# !className separator
-..............................
-"""
-http :5001/api/users name="Alice Caroll" email="alice@foo.com" nickname="alice"
-http :5001/api/users name="Bob Morane" email="bob@foo.com" nickname="bob"
-# !diff(1:1) +
-http :5001/api/users name="Charlie Chaplin" email="charlie@foo.com" nickname="charlie"
-"""
-@app.route('/api/users', methods=['POST'])
-def create_user():
 ```
 
 ## !!steps step 06: add a /api/users/*id* endpoint
@@ -676,18 +604,22 @@ use the `get()` method to retrieve the user by its primary key
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-'''
-redirect the / route to /front/users
-'''
+# !diff(1:1) -
 VERSION = "05"
-# !diff(1:4) +
-"""
-new GET endpoint /api/users/<user_id> to retrieve a single user
-"""
+# !diff(1:1) +
 VERSION = "06"
 import json
 import requests
+# !className separator
+..............................
+"""
+http :5001/api/users name="Alice Caroll" email="alice@foo.com" nickname="alice"
+http :5001/api/users name="Bob Morane" email="bob@foo.com" nickname="bob"
+# !diff(1:1) +
+http :5001/api/users name="Charlie Chaplin" email="charlie@foo.com" nickname="charlie"
+"""
+@app.route('/api/users', methods=['POST'])
+def create_user():
 # !className separator
 ..............................
         for user in users]
@@ -734,15 +666,9 @@ SQLAlchemy;
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-"""
-new GET endpoint /api/users/<user_id> to retrieve a single user
-"""
+# !diff(1:1) -
 VERSION = "06"
-# !diff(1:4) +
-'''
-create a table for messages
-'''
+# !diff(1:1) +
 VERSION = "07"
 import json
 # !diff(1:1) +
@@ -830,30 +756,22 @@ list-users
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-'''
-create a table for messages
-'''
+# !diff(1:1) -
 VERSION = "07"
-# !diff(1:4) +
-''''
-new POST endpoint /api/messages to create a message
-''''
+# !diff(1:1) +
 VERSION = "07b"
 import json
 from datetime import datetime as DateTime
 # !className separator
 ..............................
         return dict(error=f"{type(exc)}: {exc}"), 422
-# !diff(1:27) +
+# !diff(1:25) +
 # try it with
 """
 http :5001/api/messages author_id=1 recipient_id=2 content="trois petits chats"
 http :5001/api/messages author_id=2 recipient_id=1 content="chapeau de paille"
 http :5001/api/messages author_id=1 recipient_id=2 content="paillasson"
 http :5001/api/messages author_id=2 recipient_id=1 content="somnambule"
-http :5001/api/messages author_id=1 recipient_id=2 content="bulletin"
-http :5001/api/messages author_id=2 recipient_id=1 content="tintamarre"
 http :5001/api/messages author_id=2 recipient_id=3 content="not visible by 1"
 """
 @app.route('/api/messages', methods=['POST'])
@@ -886,26 +804,16 @@ not very useful actually, but only for completeness.
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-''''
-new POST endpoint /api/messages to create a message
-''''
+# !diff(1:1) -
 VERSION = "07b"
-# !diff(1:4) +
-"""
-new GET /api/messages/ to retrieve all messages
-"""
+# !diff(1:1) +
 VERSION = "08"
 import json
 from datetime import datetime as DateTime
 # !className separator
 ..............................
-        return parameters
-    except Exception as exc:
         return dict(error=f"{type(exc)}: {exc}"), 422
 # !diff(1:13) +
-
-
 # try it with
 """
 http :5001/api/messages
@@ -917,6 +825,10 @@ def list_messages():
             id=message.id, content=message.content, date=message.date,
             author_id=message.author_id, recipient_id=message.recipient_id)
         for message in messages]
+
+
+## Frontend
+# for clarity we define our routes in the /front namespace
 ```
 
 ## !!steps step 09: get messages for a user
@@ -952,15 +864,9 @@ but let's not get ahead of ourselves, we will improve all this later on
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-"""
-new GET /api/messages/ to retrieve all messages
-"""
+# !diff(1:1) -
 VERSION = "08"
-# !diff(1:4) +
-'''
-new GET /api/messages/with/<user_id> endpoint - first draft
-'''
+# !diff(1:1) +
 VERSION = "09"
 import json
 from datetime import datetime as DateTime
@@ -968,13 +874,12 @@ from datetime import datetime as DateTime
 ..............................
             author_id=message.author_id, recipient_id=message.recipient_id)
         for message in messages]
-# !diff(1:22) +
+# !diff(1:21) +
 
 # try it with
 """
 http :5001/api/messages/with/1
 """
-
 @app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
 def list_messages_to(recipient_id):
     """"
@@ -1005,15 +910,9 @@ hence the import of the `or_` function from SQLAlchemy, that will allow us to co
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-'''
-new GET /api/messages/with/<user_id> endpoint - first draft
-'''
+# !diff(1:1) -
 VERSION = "09"
-# !diff(1:4) +
-"""
-/api/messages/with/<user_id> returns both from and to user
-"""
+# !diff(1:1) +
 VERSION = "10"
 import json
 from datetime import datetime as DateTime
@@ -1027,6 +926,11 @@ from sqlalchemy.sql import or_
 app = Flask(__name__)
 # !className separator
 ..............................
+"""
+http :5001/api/messages/with/1
+"""
+# !diff(1:1) +
+
 @app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
 def list_messages_to(recipient_id):
 # !diff(1:5) -
@@ -1096,15 +1000,9 @@ so in the `/api/messages/with/<id>` endpoint, we add a `author` and a
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-"""
-/api/messages/with/<user_id> returns both from and to user
-"""
+# !diff(1:1) -
 VERSION = "10"
-# !diff(1:4) +
-'''
-/api/messages/with/<user_id> returns users details
-'''
+# !diff(1:1) +
 VERSION = "11"
 import json
 from datetime import datetime as DateTime
@@ -1178,15 +1076,9 @@ patience...
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-'''
-/api/messages/with/<user_id> returns users details
-'''
+# !diff(1:1) -
 VERSION = "11"
-# !diff(1:4) +
-"""
-/front/messages/<user_id> builds a html page to see messages
-"""
+# !diff(1:1) +
 VERSION = "12"
 import json
 from datetime import datetime as DateTime
@@ -1291,15 +1183,9 @@ displayed in the list of messages
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-"""
-/front/messages/<user_id> builds a html page to see messages
-"""
+# !diff(1:1) -
 VERSION = "12"
-# !diff(1:4) +
-'''
-/front/messages/<user_id> has a dialog to send messages
-'''
+# !diff(1:1) +
 VERSION = "13"
 import json
 from datetime import datetime as DateTime
@@ -1426,16 +1312,9 @@ message only contains user ids, not the user names
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-'''
-/front/messages/<user_id> has a dialog to send messages
-'''
+# !diff(1:1) -
 VERSION = "13"
-# !diff(1:5) +
-"""
-/front/messages/<user_id> keeps track of the message it just sent
-see also differences in script.js
-"""
+# !diff(1:1) +
 VERSION = "14"
 import json
 from datetime import datetime as DateTime
@@ -1495,18 +1374,9 @@ made aware of incoming messages
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:5) -
-"""
-/front/messages/<user_id> keeps track of the message it just sent
-see also differences in script.js
-"""
+# !diff(1:1) -
 VERSION = "14"
-# !diff(1:6) +
-'''
-/api/messages creation endpoint returns more details
-like author and recipient, and date
-see also changes in script.js
-'''
+# !diff(1:1) +
 VERSION = "15"
 import json
 from datetime import datetime as DateTime
@@ -1635,17 +1505,9 @@ required for the app to work properly
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:6) -
-'''
-/api/messages creation endpoint returns more details
-like author and recipient, and date
-see also changes in script.js
-'''
+# !diff(1:1) -
 VERSION = "15"
-# !diff(1:4) +
-"""
-app.py enables SocketIO & the front (HTML) messages page connects to the socket
-"""
+# !diff(1:1) +
 VERSION = "16"
 import json
 from datetime import datetime as DateTime
@@ -1757,16 +1619,9 @@ channel yet... but we'll fix it later
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-"""
-app.py enables SocketIO & the front (HTML) messages page connects to the socket
-"""
+# !diff(1:1) -
 VERSION = "16"
-# !diff(1:5) +
-'''
-pass current nickname to the JS code
-use it to subscribe to that SocketIO channel
-'''
+# !diff(1:1) +
 VERSION = "17"
 import json
 from datetime import datetime as DateTime
@@ -1857,16 +1712,9 @@ the only thing remaining is for the frontend to use that data to reresh its page
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:5) -
-'''
-pass current nickname to the JS code
-use it to subscribe to that SocketIO channel
-'''
+# !diff(1:1) -
 VERSION = "17"
-# !diff(1:4) +
-"""
-backend notifies of new messages on the socketio channel
-"""
+# !diff(1:1) +
 VERSION = "18"
 import json
 from datetime import datetime as DateTime
@@ -1896,18 +1744,17 @@ and this time the app is totally functional !
 ```python ! app.py
 # !className separator
 ..............................
-# !diff(1:4) -
-"""
-backend notifies of new messages on the socketio channel
-"""
+# !diff(1:1) -
 VERSION = "18"
-# !diff(1:4) +
-'''
-properly display incoming messages in the frontend
-'''
+# !diff(1:1) +
 VERSION = "19"
 import json
+# !diff(1:1) -
 from datetime import datetime as DateTime
+# !diff(1:1) +
+#from datetime import datetime as DateTime
+import requests
+from flask import Flask
 ```
 
 ## !!steps step 19: JavaScript code

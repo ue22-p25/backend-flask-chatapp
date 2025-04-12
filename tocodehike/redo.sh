@@ -55,12 +55,32 @@ function fill() {
     python $BIN/fillauto.py $APP/scrollycoding $APP/singlecolumn
 }
 
+# the full monty
 function all() {
     clone
     need-pull
     tofolders
     toauto
     fill
+}
+
+# using the folders as reference
+function from-folders() {
+    toauto
+    fill
+}
+
+function from-git() {
+    tofolders
+    toauto
+    fill
+}
+
+function save-steps() {
+    echo "the recipe:"
+    echo "cd $STEPS_REPO"
+    echo "git branch -f main HEAD"
+    echo "git push -f origin main:main"
 }
 
 "$@"

@@ -65,7 +65,7 @@ This triggers the minimal SQL code, just to make sure we can reach the DB; think
 in all the rest we assume you run the Flask server on port 5001  
 
 ```bash
-http ://localhost:5001/db/alive
+http :5001/db/alive
 ```
 
 ### Note for windows users
@@ -77,7 +77,7 @@ It seems that the `http` command, when run on "Git Bash" for Windows, triggers a
 In that case, take the message at face value, and add the `-I` (shorthand for `--ignore-stdin`) option to the command:
 
 ```bash
-http -I ://localhost:5001/db/alive
+http -I :5001/db/alive
 ```
 
 **Tip**: to continue using the same sentence (i.e. without the `-I`), you might be able to trick bash and define an alias
@@ -134,7 +134,7 @@ so that one can define a breaking change in the API, and still support the previ
 ### to try it out
 
 ```bash
-http ://localhost:5001/api/version
+http :5001/api/version
 ```
 ```python app.py
 # !className separator

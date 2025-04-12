@@ -833,7 +833,7 @@ more useful now, we need an API endpoint to retrieve messages for a given user
 like always we will refer to the user **by its primary key**, so that is the
 expected parameter in the URL
 
-in other words, /api/messages/with/1 will return all messages for the user with id 1
+in other words, `/api/users/1/messages` will return all messages for the user with `id` 1
 
 ### a first implementation
 
@@ -873,10 +873,10 @@ from datetime import datetime as DateTime
 
 # try it with
 """
-http :5001/api/messages/with/1
+http :5001/api/users/1/messages
 """
 
-@app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
+@app.route('/api/users/<int:recipient_id>/messages', methods=['GET'])
 def list_messages_to(recipient_id):
     """"
     returns only the messages to a given person
@@ -922,7 +922,7 @@ from sqlalchemy.sql import or_
 app = Flask(__name__)
 # !className separator
 ..............................
-@app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
+@app.route('/api/users/<int:recipient_id>/messages', methods=['GET'])
 def list_messages_to(recipient_id):
 # !diff(1:5) -
     """"
@@ -984,7 +984,7 @@ recipient = relationship("User", foreign_keys=[recipient_id])
 ### impact on the endpoint
 
 as we have decided earlier, we stick to the strategy that we explicitly build the dicts returned by the API  
-so in the `/api/messages/with/<id>` endpoint, we add a `author` and a
+so in the `/api/users/<id>/messages` endpoint, we add a `author` and a
 `receiver` keys to the returned dict (and thus remove the `author_id` and
 `recipient_id` keys that can now be retrieved through the `author` and
 `recipient` relationships)
@@ -1044,7 +1044,7 @@ this comes in two parts:
 ### accessing the DB
 
 like for the earlier step, we refrain from accessing the DB directly, and use
-the `/api/messages/with/<id>` endpoint  
+the `/api/users/<id>/messages` endpoint  
 the arguments we had for users - the fact that we want the app to remain modular - still holds as well of course  
 plus, on top of that, the approach here makes even more sense, in that the logic for
 retrieval this time is a little more complex, and **should not be duplicated**
@@ -1080,7 +1080,7 @@ def front_messages(recipient):
         return dict(error="could not request user info", url=url,
                     status=req1.status_code, text=req1.text)
     user = req1.json()
-    req2 = requests.get(request.url_root + f'/api/messages/with/{recipient}')
+    req2 = requests.get(request.url_root + f'/api/users/{recipient}/messages')
     if not (200 <= req2.status_code < 300):
         return dict(error="could not request messages list", url=url,
                     status=req2.status_code, text=req2.text)
@@ -1104,7 +1104,7 @@ the template is created with 2 variables:
 - `user`: the details about the user, that we get .. wait for it .. from the
   `/api/users/<id>` endpoint
 - `messages`: the messages for the user, that we get from the
-  `/api/messages/with/<id>` endpoint
+  `/api/users/<id>/messages` endpoint
 
 in this first version we just display the messages, we'll add a prompt area later on
 ```html messages.html.j2

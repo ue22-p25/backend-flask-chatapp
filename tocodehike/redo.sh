@@ -77,10 +77,12 @@ function from-git() {
 }
 
 function save-steps() {
-    echo "the recipe:"
-    echo "cd $STEPS_REPO"
+    echo "===== the recipe:"
+    echo "cd $STEPS"
     echo "git branch -f main HEAD"
     echo "git push -f origin main:main"
+    echo "cd -"
+    echo "===== end recipe"
 }
 
 "$@"

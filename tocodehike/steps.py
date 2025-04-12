@@ -351,12 +351,19 @@ def diff_branches(repo: Path, branch1: str, branch2: str) -> ShellSuccess:
         info(f"{d2.keys()=}")
 
     for (s1, (h1, m1)), (s2, (h2, m2)) in zip(d1.items(), d2.items()):
-        info(40*'-')
-        info(f"{h1}: {s1} - {m1}")
-        info(f"{h2}: {s2} - {m2}")
+        has_changes = False
+        if s1 != s2 or m1 != m2:
+            has_changes = True
         command = f"git diff {h1} {h2}"
-        info(command)
-        completed = shell(command)
+        output = shell(command, capture_output=True)
+        if output.stdout:
+            has_changes = True
+        if has_changes:
+            info(40*'-')
+            info(f"{h1}: {s1} - {m1}")
+            info(f"{h2}: {s2} - {m2}")
+            info(command)
+            print(output.stdout.decode())
 
 
 if __name__ == '__main__':

@@ -20,16 +20,15 @@ the starter code in step 00 is the basic Flask `hello world` app
 ### after thoughts
 
 it seems that the choice of our endpoints is not necessarily in line with common practice;
-the following renamings have been suggested:
+the following renaming has been suggested:
 
-- `/api/users/1/messages` instead of `/api/messages/with/1` to retrieve messages for a specific user
-- `/api/messages/1/` to send a message from user 1, with the other message fields (like `recipient_id`) 
+- `/api/messages/1/` to send a message from user 1, with the other message fields (like `recipient_id`)
   passed in the POST JSON data
 
 
 ### further work
 
-from this, you can now improve this code to support actual (multi-people) rooms; 
+from this, you can now improve this code to support actual (multi-people) rooms;
 2 levels of involvement can be envisioned
 
 1. Just write the steps that would be needed, in mush the same way as above

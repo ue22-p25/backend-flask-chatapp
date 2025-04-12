@@ -252,11 +252,12 @@ from sqlalchemy.sql import text
 # !className separator
 ..............................
     return dict(version=VERSION)
-# !diff(1:24) +
+# !diff(1:25) +
 # try it with
 """
 http :5001/api/users name="Alice Caroll" email="alice@foo.com" nickname="alice"
 http :5001/api/users name="Bob Morane" email="bob@foo.com" nickname="bob"
+http :5001/api/users name="Charlie Chaplin" email="charlie@foo.com" nickname="charlie"
 """
 @app.route('/api/users', methods=['POST'])
 def create_user():
@@ -616,16 +617,6 @@ import json
 import requests
 # !className separator
 ..............................
-"""
-http :5001/api/users name="Alice Caroll" email="alice@foo.com" nickname="alice"
-http :5001/api/users name="Bob Morane" email="bob@foo.com" nickname="bob"
-# !diff(1:1) +
-http :5001/api/users name="Charlie Chaplin" email="charlie@foo.com" nickname="charlie"
-"""
-@app.route('/api/users', methods=['POST'])
-def create_user():
-# !className separator
-..............................
         for user in users]
 # !diff(1:15) +
 # try it with
@@ -878,12 +869,13 @@ from datetime import datetime as DateTime
 ..............................
             author_id=message.author_id, recipient_id=message.recipient_id)
         for message in messages]
-# !diff(1:21) +
+# !diff(1:22) +
 
 # try it with
 """
 http :5001/api/messages/with/1
 """
+
 @app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
 def list_messages_to(recipient_id):
     """"
@@ -930,11 +922,6 @@ from sqlalchemy.sql import or_
 app = Flask(__name__)
 # !className separator
 ..............................
-"""
-http :5001/api/messages/with/1
-"""
-# !diff(1:1) +
-
 @app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
 def list_messages_to(recipient_id):
 # !diff(1:5) -
@@ -1020,16 +1007,6 @@ from datetime import datetime as DateTime
     recipient = db.relationship('User', foreign_keys=[recipient_id], backref='received_messages')
 # actually create the database (i.e. tables etc)
 with app.app_context():
-# !className separator
-..............................
-"""
-http :5001/api/messages/with/1
-"""
-# !diff(1:1) -
-
-@app.route('/api/messages/with/<int:recipient_id>', methods=['GET'])
-def list_messages_to(recipient_id):
-    """
 # !className separator
 ..............................
             Message.recipient_id==recipient_id,
@@ -1753,12 +1730,7 @@ VERSION = "18"
 # !diff(1:1) +
 VERSION = "19"
 import json
-# !diff(1:1) -
 from datetime import datetime as DateTime
-# !diff(1:1) +
-#from datetime import datetime as DateTime
-import requests
-from flask import Flask
 ```
 
 ## step 19: JavaScript code

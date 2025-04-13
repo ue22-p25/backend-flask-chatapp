@@ -5,7 +5,7 @@ ROOT=$(dirname $BIN)
 # the js main dir
 APP=${ROOT}/app
 
-# wher to get the steps
+# where to get the steps
 STEPS_REPO=git@github.com:ue22-p24/backend-flask-chatapp-steps.git
 # where we graft it here
 STEPS=${BIN}/steps-repo
@@ -29,28 +29,34 @@ function need-pull() {
     fi
 }
 
+# compute the steps folder from the git repo
 function tofolders() {
     $BIN/steps.py tofolders $STEPS
 }
 
+# create a new branch in the steps repo from the current folders
+function togit() {
+    $BIN/steps.py togit $STEPS
+}
+
+# compute AUTO in singlecolumn
 function toauto-1() {
     local out=$APP/singlecolumn/AUTO
     python $BIN/tocodehike.py chain-dirs --all-files ${STEPS}/.steps/* > $out
     echo single column output written in $out
 }
-
+# compute AUTO in scrollycoding
 function toauto-2() {
     local out=$APP/scrollycoding/AUTO
     python $BIN/tocodehike.py chain-dirs --all-files --scrolly ${STEPS}/.steps/* > $out
     echo double column output written in $out
 }
-
+# both
 function toauto() {
     toauto-1
     toauto-2
 }
-
-# create 2 symlinks inside to the -hike repo
+# use the .je template and the AUTO files to create the final output
 function fill() {
     python $BIN/fillauto.py $APP/scrollycoding $APP/singlecolumn
 }
@@ -64,18 +70,21 @@ function all() {
     fill
 }
 
-# using the folders as reference
+###########
+# compute the output, using the folders as reference
 function from-folders() {
     toauto
     fill
 }
 
+# compute the output, using the steps repo as reference
 function from-git() {
     tofolders
     toauto
     fill
 }
 
+# display the recipe to adopt the latest created branch as main in the steps repo
 function save-steps() {
     echo "===== the recipe:"
     echo "cd $STEPS"
@@ -83,6 +92,27 @@ function save-steps() {
     echo "git push -f origin main:main"
     echo "cd -"
     echo "===== end recipe"
+}
+
+# tests: shorter outputs, because the dev server is so slow..
+TESTSTEPS=${STEPS}/.steps/0[0-4]*
+function testauto-1() {
+    local out=$APP/singlecolumn/AUTO
+    python $BIN/tocodehike.py chain-dirs --all-files $TESTSTEPS > $out
+    echo single column output written in $out
+}
+function testauto-2() {
+    local out=$APP/scrollycoding/AUTO
+    python $BIN/tocodehike.py chain-dirs --all-files --scrolly $TESTSTEPS > $out
+    echo double column output written in $out
+}
+function testauto() {
+    testauto-1
+    testauto-2
+}
+function test() {
+    testauto
+    fill
 }
 
 "$@"

@@ -4,13 +4,13 @@
 
 this are the sources for a static website generated from the contents of
 
-https://github.com/ue22-p24/backend-flask-chatapp
+https://github.com/ue22-p24/backend-flask-chatapp-steps
 
 ## where is it ?
 
-for starters the outcome is published on 
+for starters the outcome is published on
 
-https://backend-chatapp.surge.sh/scrollycoding
+https://ue22-p24.github.io/backend-flask-chatapp/scrollycoding
 
 ## how is it done ?
 

@@ -165,7 +165,9 @@ def onedir_diff(dir1, dir2, only_git):
     """
     compare two folders
     - files that appear in both: use onefile_diff
-    - files that appear in one but not the other: print a simple code block
+    - new files i.e. that appear in dir2 but not dir1:
+      print a simple code block with the new one
+    - deleted files: just mention them as deleted
     """
     path1, path2 = Path(dir1), Path(dir2)
     for path in [path1, path2]:
@@ -183,32 +185,46 @@ def onedir_diff(dir1, dir2, only_git):
     files1 = sorted(set(sp1.stdout.decode().splitlines()))
     files2 = sorted(set(sp2.stdout.decode().splitlines()))
 
+    readme = dir2 / "readme.md"
+    if not readme.exists():
+        print(f"!!! WARNING !!! File {readme} does not exist!", file=sys.stderr)
+        dir_readme = "no dir readme !"
+    else:
+        with readme.open() as f:
+            # should contain '# the step readme'
+            dir_readme = f.readline().strip()[2:]
+            dir_readme = dir_readme.replace('<', '&lt;').replace('>', '&gt;')
 
     # ignore README.md in the list of files
     files1 = [f for f in files1 if not f.lower().endswith('readme.md')]
     files2 = [f for f in files2 if not f.lower().endswith('readme.md')]
 
     same_files =  sorted(set(files1) & set(files2))
+    # discard files that are the same
+    same_files = [f for f in same_files if not files_equal(path1 / f, path2 / f)]
     new_files = sorted(set(files2) - set(files1))
     deleted_files = sorted(set(files1) - set(files2))
 
-    def handle_first_line(line, name, d1, d2):
+    def handle_first_line(line, name, d1, d2, nth, total):
         if not line.startswith('## '):
             print(f"!!! WARNING !!! README file {readme} does not start with ##", file=sys.stderr)
             title = "!!! MISSING TITLE in {d2}/{name} !!!"
         else:
             title = line[3:].strip()
+            locator = f" ({nth}/{total})" if total != 1 else ""
         if SCROLLY:
-            print(f"## !!steps step {d2}: {title}")
+            print(f"## !!steps {d2}{locator}: {dir_readme}")
         else:
-            print(f"## step {d2}: {title}")
+            print(f"## step {d2}{locator}: {dir_readme}")
 
         if d1:
             print(f"### {d1} -> {d2} - changes in {name}")
         else:
-            print(f"### new in {d2} - file {name}")
+            print(f"### {d2} : new file {name}")
 
-    def handle_readme(path, *, new_dir, old_dir=None):
+        print(f"#### {title}")
+
+    def handle_readme(path, *, new_dir, nth, total=None, old_dir=None):
         """
         d1=None mean it's a new file in d2
         """
@@ -217,7 +233,7 @@ def onedir_diff(dir1, dir2, only_git):
             with readme.open() as f:
                 for lineno, line in enumerate(f, 1):
                     if lineno == 1:
-                        handle_first_line(line, path.name, old_dir, new_dir)
+                        handle_first_line(line, path.name, old_dir, new_dir, nth, total)
                     else:
                         print(line, end="")
                 if not line.endswith('\n'):
@@ -228,30 +244,30 @@ def onedir_diff(dir1, dir2, only_git):
 
 
     # open the possibility to specify an order
-    def handle_same_file(file):
-        # if the files are equal, we don't need to show them
-        if not files_equal(path1 / file, path2 / file):
-            print(f"changes in file: {file}", file=sys.stderr)
-            # md_title(f"{d1} -> {d2} - changes in file: {file}", level=3, not_a_step=True)
-            handle_readme(path2 / file, old_dir=d1, new_dir=d2)
-            onefile_diff(path1 / file, path2 / file)
+    def handle_same_file(file, nth, total):
+        print(f"changes in file: {file}", file=sys.stderr)
+        handle_readme(path2 / file, old_dir=d1, new_dir=d2, nth=nth, total=total)
+        onefile_diff(path1 / file, path2 / file)
 
-    def handle_new_file(file):
+    def handle_new_file(file, nth, total):
         print(f"new file: {file2}", file=sys.stderr)
-        # md_title(f"in {d2} - new file: {file2}", level=3, not_a_step=True)
-        handle_readme(path2 / file, new_dir=d2)
+        handle_readme(path2 / file, new_dir=d2, nth=nth, total=total)
         onefile_cat(path2 / file2, added=True)
 
-    # md_title(f"changes in {d1} -> {d2}", level=2)
+    total_changes = len(same_files) + len(new_files) + len(deleted_files)
+
+    nth = 1
     for file in same_files:
-        handle_same_file(file)
+        handle_same_file(file, nth, total_changes)
+        nth += 1
     for file2 in new_files:
-        handle_new_file(file2)
+        handle_new_file(file2, nth, total_changes)
+        nth += 1
 
     for file1 in deleted_files:
-        print(f"deleted file: {file1}", file=sys.stderr)
-        # ignore such cases for now, might mess with the scrolly logic
-        # md_title(f"in {d2} - deleted file: {file1}", level=3)
+        print(f"deleted file : {file1}", file=sys.stderr)
+        print(f"## {nth}/{total_changes} deleted in {d2}: {file1}")
+        nth += 1
 
 def chaindirs(paths, only_git):
     """

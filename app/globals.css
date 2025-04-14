@@ -24,13 +24,14 @@
 
 h2 {
   background-color: #767d3b;
-  padding: 20px 40px;
+  padding: 1em 3em;
   border-radius: 5px;
+  margin-bottom: 0.6em !important;
 }
 
 h3 {
   /* background-color: rgb(225, 148, 32); */
-  padding: 0 5px;
+  padding: 0.3em 2em;
   border-radius: 6px;
   &::before {
     content: " ✅ ";
@@ -40,8 +41,17 @@ h3 {
 h2+div>h3:first-child, h2+h3 {
     background-color: #b6538e;
   opacity: 0.8;
-  border-radius: 3px;
+  border-radius: 4px;
+  margin-top: 0.6em;
   &::before {
-    content: "🚀 ";
+    content: " 🚀 ";
+  }
+  &+h4 {
+    padding: 0.3em 2em;
+    border-radius: 3px;
+    background-color: rgb(119, 61, 144);
+    &::before {
+      content: " → ";
+    }
   }
 }

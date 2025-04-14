@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "npx serve@latest out",
+    "local-prefix": "(cd out; rm -f backend-flask-chatapp && ln -s . backend-flask-chatapp)",
     "lint": "next lint"
   },
   "dependencies": {

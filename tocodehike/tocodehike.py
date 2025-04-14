@@ -185,19 +185,19 @@ def onedir_diff(dir1, dir2, only_git):
     files1 = sorted(set(sp1.stdout.decode().splitlines()))
     files2 = sorted(set(sp2.stdout.decode().splitlines()))
 
-    readme = dir2 / "readme.md"
-    if not readme.exists():
-        print(f"!!! WARNING !!! File {readme} does not exist!", file=sys.stderr)
+    global_step = dir2 / "step.md"
+    if not global_step.exists():
+        print(f"!!! WARNING !!! File {global_step} does not exist!", file=sys.stderr)
         dir_readme = "no dir readme !"
     else:
-        with readme.open() as f:
+        with global_step.open() as f:
             # should contain '# the step readme'
             dir_readme = f.readline().strip()[2:]
             dir_readme = dir_readme.replace('<', '&lt;').replace('>', '&gt;')
 
-    # ignore README.md in the list of files
-    files1 = [f for f in files1 if not f.lower().endswith('readme.md')]
-    files2 = [f for f in files2 if not f.lower().endswith('readme.md')]
+    # ignore step.md in the list of files
+    files1 = [f for f in files1 if not f.lower().endswith('step.md')]
+    files2 = [f for f in files2 if not f.lower().endswith('step.md')]
 
     same_files =  sorted(set(files1) & set(files2))
     # discard files that are the same
@@ -207,7 +207,7 @@ def onedir_diff(dir1, dir2, only_git):
 
     def handle_first_line(line, name, d1, d2, nth, total):
         if not line.startswith('## '):
-            print(f"!!! WARNING !!! README file {readme} does not start with ##", file=sys.stderr)
+            print(f"!!! WARNING !!! README file {global_step} does not start with ##", file=sys.stderr)
             title = "!!! MISSING TITLE in {d2}/{name} !!!"
         else:
             title = line[3:].strip()
@@ -228,9 +228,9 @@ def onedir_diff(dir1, dir2, only_git):
         """
         d1=None mean it's a new file in d2
         """
-        readme = path.parent / (path.name + '-readme.md')
-        if readme.exists():
-            with readme.open() as f:
+        file_step = path.parent / (path.name + '-step.md')
+        if file_step.exists():
+            with file_step.open() as f:
                 for lineno, line in enumerate(f, 1):
                     if lineno == 1:
                         handle_first_line(line, path.name, old_dir, new_dir, nth, total)
@@ -239,7 +239,7 @@ def onedir_diff(dir1, dir2, only_git):
                 if not line.endswith('\n'):
                     print()
         else:
-            print(f"!!! WARNING !!! File {readme} does not exist!", file=sys.stderr)
+            print(f"!!! WARNING !!! File {file_step} does not exist!", file=sys.stderr)
             print(f"!!! WARNING !!! output likely broken !!!", file=sys.stderr)
 
 

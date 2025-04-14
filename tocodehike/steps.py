@@ -49,7 +49,7 @@ def shell_capture(command: str, **kwds) -> sp.CompletedProcess:
 # temporary
 def retrieve_message_from_commit(repo, step, branch):
     """
-    normally the one-liner attached to a step is in readme.md
+    normally the one-liner attached to a step is in step.md
     however as a last resort
     when bootstrapping from a git repository
     we may find the message in the log messages
@@ -61,19 +61,19 @@ def retrieve_message_from_commit(repo, step, branch):
     return "unknown", "cannot find message"
 
 
-def retrieve_message_from_readme(repo):
-    readme = repo / "readme.md"
-    if not readme.exists():
-        warning(f"!! {readme} does not exist")
+def retrieve_message_from_step_md(repo):
+    step_md_file = repo / "step.md"
+    if not step_md_file.exists():
+        warning(f"!! {step_md_file} does not exist")
         return "unknown", "cannot find message"
-    with readme.open() as f:
+    with step_md_file.open() as f:
         content = f.read()
         if match := README_MATCHER.match(content):
             return None, match.group("message")
         else:
-            warning(f"!!! WARNING !!! {readme} not understood")
+            warning(f"!!! WARNING !!! {step_md_file} not understood")
             warning(content)
-            warning(f"!!! WARNING !!! {readme} end")
+            warning(f"!!! WARNING !!! {step_md_file} end")
 
     return None, "cannot find message"
 
@@ -208,17 +208,17 @@ def togit(branch_name, input_steps_folder, repo: Path) -> ShellSuccess:
         completed = shell( f"tar -C {step_path} -cf - {files_str} | tar -C {repo.absolute()} -xf -")
         message = strip_docstring(Path("app.py"))
         if not message:
-            _, message = retrieve_message_from_readme(repo)
+            _, message = retrieve_message_from_step_md(repo)
         if not message:
             readme_step, message = retrieve_message_from_commit(repo, step, 'main')
             if readme_step != step:
                 warning(f"!!! {step} does not match {readme_step} - using {message}")
         # save message for next time
         # in repo this time
-        readme = Path("readme.md")
-        with readme.open('w') as f:
+        step_md = Path("step.md")
+        with step_md.open('w') as f:
             f.write(f"# {message}\n")
-        completed = shell(f"git add readme.md")
+        completed = shell(f"git add step.md")
 
 
         completed = shell(f"git add {files_str}")
@@ -275,9 +275,9 @@ def tofolders(git_repo: Path, output_root: Path) -> list[Path]:
             info(f"populating {folder.name}")
             command = f"git -C {git_repo} archive {commit} | tar -C {folder} -xf -"
             shell(command)
-            readme = folder / "readme.md"
-            if not readme.exists():
-                with readme.open('w') as f:
+            step_md = folder / "step.md"
+            if not step_md.exists():
+                with step_md.open('w') as f:
                     f.write(f"{message}\n")
         parent = git_shell(f"log --pretty='%p' -n 1 {commit}")
         if not parent or parent == commit:

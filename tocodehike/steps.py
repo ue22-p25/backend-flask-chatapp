@@ -198,7 +198,9 @@ def togit(branch_name, input_steps_folder, repo: Path) -> ShellSuccess:
 
         files_list = [file for file in files_list if (step_path/file).is_file()]
         files_str = " ".join(str(file) for file in files_list)
-        debug(f"found {len(list(files_list))} files")
+        info(f"found {len(list(files_list))} files")
+        for file in files_list:
+            debug(f"  {file}")
         # xxx need to remove lingering files ?
         # we have seen e.g. app.py~ and _pycache__ files after trying out something in there...
         # the solution might be with having a .gitignore despite all...
@@ -226,6 +228,7 @@ def togit(branch_name, input_steps_folder, repo: Path) -> ShellSuccess:
             if to_remove.exists():
                 debug(f"removing {to_remove}")
                 to_remove.unlink()
+                completed = shell(f"git rm {to_remove}")
             else:
                 warning(f"!!! {to_remove} does not exist")
 

@@ -104,7 +104,7 @@ const TableOfContents: FC<Props> = () => {
                     // color: section.isActive
                     //   ? customTheme.palette.secondary.main
                     //   : customTheme.palette.text.primary,
-                    color: section.isActive ? 'goldenrod' : 'purple',
+                    color: section.isActive ? 'goldenrod' : 'var(--color-pink)',
                     // textTransform: 'capitalize',
                     cursor: 'pointer',
                   }}

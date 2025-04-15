@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 /* Custom styles */
+body {
+  margin-left: 20px;
+}
+
 /* 
  * tocodehike separate diff chunks with a line that reads
  * # !className separator
@@ -17,7 +21,7 @@
   margin: 0.5rem 0;
 
   /* but when the class is present we can hide the line that has all the dots */
-  > * {
+  >* {
     display: none;
   }
 }
@@ -33,25 +37,54 @@ h3 {
   /* background-color: rgb(225, 148, 32); */
   padding: 0.3em 2em;
   border-radius: 6px;
+
   &::before {
     content: " ✅ ";
   }
 }
 
 h2+div>h3:first-child, h2+h3 {
-    background-color: #b6538e;
+  background-color: #b6538e;
   opacity: 0.8;
   border-radius: 4px;
   margin-top: 0.6em;
+
   &::before {
     content: " 🚀 ";
   }
+
   &+h4 {
     padding: 0.3em 2em;
     border-radius: 3px;
     background-color: rgb(119, 61, 144);
+
     &::before {
       content: " → ";
     }
+  }
+}
+
+.MuiTimeline-root {
+  align-items: flex-start;
+  width: 30em;
+
+  .MuiTimelineItem-root {
+    width: 100%;
+    /* align-items: flex-start; */
+    min-height: 20px;
+    padding: 0px 0px !important;
+    margin: 0px 0px !important;
+    line-height: 1;
+    align-items: baseline;
+
+    &::before {
+      display: none !important;
+    }
+    .MuiTimelineDot-root {
+      margin: 0px !important
+    }
+    .MuiTypography-root {
+      height: 24px !important;
+   }
   }
 }

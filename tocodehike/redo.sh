@@ -72,20 +72,20 @@ function all() {
 
 ###########
 # compute the output, using the folders as reference
-function from-folders() {
+function fromfolders() {
     toauto
     fill
 }
 
 # compute the output, using the steps repo as reference
-function from-git() {
+function fromgit() {
     tofolders
     toauto
     fill
 }
 
 # display the recipe to adopt the latest created branch as main in the steps repo
-function save-steps() {
+function savegit() {
     echo "===== the recipe:"
     echo "cd $STEPS"
     echo "git branch -f main HEAD"

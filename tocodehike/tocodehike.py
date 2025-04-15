@@ -215,7 +215,9 @@ def onedir_diff(dir1, dir2, only_git):
         if SCROLLY:
             print(f"## !!steps {d2}{locator}: {dir_readme}")
         else:
-            print(f"## step {d2}{locator}: {dir_readme}")
+            # the headers has been inserted already as a TableOfContentsItem
+            pass
+            # print(f"## step {d2}{locator}: {dir_readme}")
 
         if d1:
             print(f"### {d1} -> {d2} - changes in {name}")
@@ -242,17 +244,29 @@ def onedir_diff(dir1, dir2, only_git):
             print(f"!!! WARNING !!! File {file_step} does not exist!", file=sys.stderr)
             print(f"!!! WARNING !!! output likely broken !!!", file=sys.stderr)
 
-
     # open the possibility to specify an order
     def handle_same_file(file, nth, total):
         print(f"changes in file: {file}", file=sys.stderr)
+        nth_verbose = f"-{nth}/{total}" if total != 1 else " - "
+
+        if not SCROLLY:
+            print(f"<TableOfContentsItem topic='step {d2}{nth_verbose} {dir_readme}'>")
         handle_readme(path2 / file, old_dir=d1, new_dir=d2, nth=nth, total=total)
         onefile_diff(path1 / file, path2 / file)
+        if not SCROLLY:
+            print(f"</TableOfContentsItem>")
+
 
     def handle_new_file(file, nth, total):
         print(f"new file: {file2}", file=sys.stderr)
+        nth_verbose = f"-{nth}/{total}" if total != 1 else " - "
+
+        if not SCROLLY:
+            print(f"<TableOfContentsItem topic='step {d2}{nth_verbose} {dir_readme}'>")
         handle_readme(path2 / file, new_dir=d2, nth=nth, total=total)
         onefile_cat(path2 / file2, added=True)
+        if not SCROLLY:
+            print(f"</TableOfContentsItem>")
 
     total_changes = len(same_files) + len(new_files) + len(deleted_files)
 

@@ -250,7 +250,7 @@ def onedir_diff(dir1, dir2, only_git):
         if nth == 1:
             label = f"{d2} {dir_readme}"
         else:
-            label = f" {d2}{nth_verbose}"
+            label = f"{d2}{nth_verbose}"
         return topic, label
 
 

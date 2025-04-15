@@ -6,11 +6,11 @@ import { FC, ReactNode } from 'react'
 
 interface Props {
   topic: string
+  label: string
   children: ReactNode
 }
 
-const TableOfContentsItem: FC<Props> = ({ topic, children }) => {
-  const label = topic.replace('step ', '')
+const TableOfContentsItem: FC<Props> = ({ topic, label, children }) => {
   return (
     // keep as is
     <section id={label} className='section-heading'>

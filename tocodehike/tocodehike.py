@@ -244,13 +244,22 @@ def onedir_diff(dir1, dir2, only_git):
             print(f"!!! WARNING !!! File {file_step} does not exist!", file=sys.stderr)
             print(f"!!! WARNING !!! output likely broken !!!", file=sys.stderr)
 
+    def heading_details(file, nth, total):
+        nth_verbose = f" - {nth}/{total}" if total != 1 else " - "
+        topic = f"step {d2}{nth_verbose} {dir_readme}"
+        if nth == 1:
+            label = f"{d2} {dir_readme}"
+        else:
+            label = f" {d2}{nth_verbose}"
+        return topic, label
+
+
     # open the possibility to specify an order
     def handle_same_file(file, nth, total):
         print(f"changes in file: {file}", file=sys.stderr)
-        nth_verbose = f"-{nth}/{total}" if total != 1 else " - "
-
+        topic, label = heading_details(file, nth, total)
         if not SCROLLY:
-            print(f"<TableOfContentsItem topic='step {d2}{nth_verbose} {dir_readme}'>")
+            print(f"<TableOfContentsItem topic='{topic}' label='{label}'>")
         handle_readme(path2 / file, old_dir=d1, new_dir=d2, nth=nth, total=total)
         onefile_diff(path1 / file, path2 / file)
         if not SCROLLY:
@@ -259,10 +268,10 @@ def onedir_diff(dir1, dir2, only_git):
 
     def handle_new_file(file, nth, total):
         print(f"new file: {file2}", file=sys.stderr)
-        nth_verbose = f"-{nth}/{total}" if total != 1 else " - "
+        topic, label = heading_details(file, nth, total)
 
         if not SCROLLY:
-            print(f"<TableOfContentsItem topic='step {d2}{nth_verbose} {dir_readme}'>")
+            print(f"<TableOfContentsItem topic='{topic}' label='{label}'>")
         handle_readme(path2 / file, new_dir=d2, nth=nth, total=total)
         onefile_cat(path2 / file2, added=True)
         if not SCROLLY:

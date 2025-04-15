@@ -529,7 +529,7 @@ the basics for Jinja2 templating is:
     ```
 
 ```html ! users.html.j2
-<!-- !diff(1:17) + -->
+<!-- !diff(1:21) + -->
 <!DOCTYPE html>
 <html>
     <head>
@@ -540,7 +540,11 @@ the basics for Jinja2 templating is:
         <div id="users">
             {% for user in users %}
                 <span class="user">
-                    <a class="pill" href="/front/messages/{{user.id}}">{{user.nickname}} ({{user.name}})</a>
+                    <a class="pill"
+                      href="/front/messages/{{user.id}}"
+                    >
+                      {{user.nickname}} ({{user.name}})
+                    </a>
                     <a href="mailto:{{user.email}}">{{user.email}}</a>
                 </span>
             {% endfor %}
@@ -1342,7 +1346,7 @@ that
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(json)
             })
-// !diff(1:13) +
+// !diff(1:18) +
             .then((response) => response.json())
             .then((data) => {
                 console.log(data)
@@ -1350,7 +1354,12 @@ that
                 // so we don't know the author and recipient nicknames
                 const {author_id, recipient_id, content, date} = data
                 const newRow = document.createElement('tr')
-                newRow.innerHTML = `<td>${date}</td><td>${author_id}</td><td>${recipient_id}</td><td>${content}</td>`
+                newRow.innerHTML = (
+                    `<td>${date}</td>`
+                  + `<td>${author_id}</td>`
+                  + `<td>${recipient_id}</td>`
+                  + `<td>${content}</td>`
+                )
                 document.getElementById('messages').appendChild(newRow)
             })
             .catch((error) => {
@@ -1438,13 +1447,17 @@ in this version, we now receive full user info, so we need to tweak the JS accor
                 // now we can diplay the author and recipient nicknames
                 const {author, recipient, content, date} = data
                 const newRow = document.createElement('tr')
-// !diff(1:1) -
-                newRow.innerHTML = `<td>${date}</td><td>${author_id}</td><td>${recipient_id}</td><td>${content}</td>`
-// !diff(1:1) +
-                newRow.innerHTML = `<td>${date}</td><td>${author.nickname}</td><td>${recipient.nickname}</td><td>${content}</td>`
+                newRow.innerHTML = (
+                    `<td>${date}</td>`
+// !diff(1:2) -
+                  + `<td>${author_id}</td>`
+                  + `<td>${recipient_id}</td>`
+// !diff(1:2) +
+                  + `<td>${author.nickname}</td>`
+                  + `<td>${recipient.nickname}</td>`
+                  + `<td>${content}</td>`
+                )
                 document.getElementById('messages').appendChild(newRow)
-            })
-            .catch((error) => {
 ```
 
 ## !!steps 16 (1/3): pouring SocketIO into the mix
@@ -1797,12 +1810,17 @@ so the changes are
     console.log("connecting to the SocketIO backend")
     const socket = io()
     // we are storing the nickname in the body element
-// !diff(1:7) +
+// !diff(1:12) +
     const display_new_message = (data) => {
         // this is assume to be a an object (so JSON.parse before if necessary)
         const {author, recipient, content, date} = data
         const newRow = document.createElement('tr')
-        newRow.innerHTML = `<td>${date}</td><td>${author.nickname}</td><td>${recipient.nickname}</td><td>${content}</td>`
+        newRow.innerHTML = (
+            `<td>${date}</td>`
+          + `<td>${author.nickname}</td>`
+          + `<td>${recipient.nickname}</td>`
+          + `<td>${content}</td>`
+        )
         document.getElementById('messages').appendChild(newRow)
     }
     const nickname = document.body.dataset.nickname
@@ -1826,13 +1844,18 @@ so the changes are
                 body: JSON.stringify(json)
             })
             .then((response) => response.json())
-// !diff(1:8) -
+// !diff(1:13) -
             .then((data) => {
                 console.log(data)
                 // now we can diplay the author and recipient nicknames
                 const {author, recipient, content, date} = data
                 const newRow = document.createElement('tr')
-                newRow.innerHTML = `<td>${date}</td><td>${author.nickname}</td><td>${recipient.nickname}</td><td>${content}</td>`
+                newRow.innerHTML = (
+                    `<td>${date}</td>`
+                  + `<td>${author.nickname}</td>`
+                  + `<td>${recipient.nickname}</td>`
+                  + `<td>${content}</td>`
+                )
                 document.getElementById('messages').appendChild(newRow)
             })
 // !diff(1:1) +

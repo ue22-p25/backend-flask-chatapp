@@ -461,7 +461,7 @@ if __name__ == '__main__':
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 04 - 2/3 GET /front/users' label=' 04 - 2/3'>
+<TableOfContentsItem topic='step 04 - 2/3 GET /front/users' label='04 - 2/3'>
 ### 04 : new file style.css
 #### some style
 
@@ -509,7 +509,7 @@ goes in the `static` folder
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 04 - 3/3 GET /front/users' label=' 04 - 3/3'>
+<TableOfContentsItem topic='step 04 - 3/3 GET /front/users' label='04 - 3/3'>
 ### 04 : new file users.html.j2
 #### the HTML template
 
@@ -545,7 +545,7 @@ the basics for Jinja2 templating is:
     ```
 
 ```html users.html.j2
-<!-- !diff(1:17) + -->
+<!-- !diff(1:21) + -->
 <!DOCTYPE html>
 <html>
     <head>
@@ -556,7 +556,11 @@ the basics for Jinja2 templating is:
         <div id="users">
             {% for user in users %}
                 <span class="user">
-                    <a class="pill" href="/front/messages/{{user.id}}">{{user.nickname}} ({{user.name}})</a>
+                    <a class="pill"
+                      href="/front/messages/{{user.id}}"
+                    >
+                      {{user.nickname}} ({{user.name}})
+                    </a>
                     <a href="mailto:{{user.email}}">{{user.email}}</a>
                 </span>
             {% endfor %}
@@ -1137,7 +1141,7 @@ if __name__ == '__main__':
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 12 - 2/2 GET /front/messages/&lt;id&gt; a front for messages' label=' 12 - 2/2'>
+<TableOfContentsItem topic='step 12 - 2/2 GET /front/messages/&lt;id&gt; a front for messages' label='12 - 2/2'>
 ### 12 : new file messages.html.j2
 #### the template
 
@@ -1243,7 +1247,7 @@ from datetime import datetime as DateTime
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 13 - 2/3 the messages web page can send messages' label=' 13 - 2/3'>
+<TableOfContentsItem topic='step 13 - 2/3 the messages web page can send messages' label='13 - 2/3'>
 ### 12 -> 13 - changes in messages.html.j2
 #### adding a form element in the template
 
@@ -1288,7 +1292,7 @@ this new version of the template:
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 13 - 3/3 the messages web page can send messages' label=' 13 - 3/3'>
+<TableOfContentsItem topic='step 13 - 3/3 the messages web page can send messages' label='13 - 3/3'>
 ### 13 : new file script.js
 #### there is a new JavaScript file
 
@@ -1350,7 +1354,7 @@ from datetime import datetime as DateTime
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 14 - 2/2 the messages page displays the new message' label=' 14 - 2/2'>
+<TableOfContentsItem topic='step 14 - 2/2 the messages page displays the new message' label='14 - 2/2'>
 ### 13 -> 14 - changes in script.js
 #### also display newly created message
 
@@ -1373,7 +1377,7 @@ that
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(json)
             })
-// !diff(1:13) +
+// !diff(1:18) +
             .then((response) => response.json())
             .then((data) => {
                 console.log(data)
@@ -1381,7 +1385,12 @@ that
                 // so we don't know the author and recipient nicknames
                 const {author_id, recipient_id, content, date} = data
                 const newRow = document.createElement('tr')
-                newRow.innerHTML = `<td>${date}</td><td>${author_id}</td><td>${recipient_id}</td><td>${content}</td>`
+                newRow.innerHTML = (
+                    `<td>${date}</td>`
+                  + `<td>${author_id}</td>`
+                  + `<td>${recipient_id}</td>`
+                  + `<td>${content}</td>`
+                )
                 document.getElementById('messages').appendChild(newRow)
             })
             .catch((error) => {
@@ -1452,7 +1461,7 @@ from datetime import datetime as DateTime
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 15 - 2/2 messages creation endpoint returns more details' label=' 15 - 2/2'>
+<TableOfContentsItem topic='step 15 - 2/2 messages creation endpoint returns more details' label='15 - 2/2'>
 ### 14 -> 15 - changes in script.js
 #### display nicknames in newly created messages
 
@@ -1471,13 +1480,17 @@ in this version, we now receive full user info, so we need to tweak the JS accor
                 // now we can diplay the author and recipient nicknames
                 const {author, recipient, content, date} = data
                 const newRow = document.createElement('tr')
-// !diff(1:1) -
-                newRow.innerHTML = `<td>${date}</td><td>${author_id}</td><td>${recipient_id}</td><td>${content}</td>`
-// !diff(1:1) +
-                newRow.innerHTML = `<td>${date}</td><td>${author.nickname}</td><td>${recipient.nickname}</td><td>${content}</td>`
+                newRow.innerHTML = (
+                    `<td>${date}</td>`
+// !diff(1:2) -
+                  + `<td>${author_id}</td>`
+                  + `<td>${recipient_id}</td>`
+// !diff(1:2) +
+                  + `<td>${author.nickname}</td>`
+                  + `<td>${recipient.nickname}</td>`
+                  + `<td>${content}</td>`
+                )
                 document.getElementById('messages').appendChild(newRow)
-            })
-            .catch((error) => {
 ```
 
 </TableOfContentsItem>
@@ -1597,7 +1610,7 @@ if __name__ == '__main__':
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 16 - 2/3 pouring SocketIO into the mix' label=' 16 - 2/3'>
+<TableOfContentsItem topic='step 16 - 2/3 pouring SocketIO into the mix' label='16 - 2/3'>
 ### 15 -> 16 - changes in script.js
 #### the frontend connects to the backend socketio server
 
@@ -1629,7 +1642,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 16 - 3/3 pouring SocketIO into the mix' label=' 16 - 3/3'>
+<TableOfContentsItem topic='step 16 - 3/3 pouring SocketIO into the mix' label='16 - 3/3'>
 ### 15 -> 16 - changes in messages.html.j2
 #### the HTML template
 
@@ -1682,7 +1695,7 @@ from datetime import datetime as DateTime
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 17 - 2/3 pass current nickname to the JS code' label=' 17 - 2/3'>
+<TableOfContentsItem topic='step 17 - 2/3 pass current nickname to the JS code' label='17 - 2/3'>
 ### 16 -> 17 - changes in script.js
 #### retrieve nickname and subscribe to the channel
 
@@ -1725,7 +1738,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 17 - 3/3 pass current nickname to the JS code' label=' 17 - 3/3'>
+<TableOfContentsItem topic='step 17 - 3/3 pass current nickname to the JS code' label='17 - 3/3'>
 ### 16 -> 17 - changes in messages.html.j2
 #### store nickname in the HTML tree
 
@@ -1816,7 +1829,7 @@ from datetime import datetime as DateTime
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 19 - 2/2 display incoming messages in the frontend' label=' 19 - 2/2'>
+<TableOfContentsItem topic='step 19 - 2/2 display incoming messages in the frontend' label='19 - 2/2'>
 ### 18 -> 19 - changes in script.js
 #### properly display incoming messages in the frontend
 
@@ -1839,12 +1852,17 @@ so the changes are
     console.log("connecting to the SocketIO backend")
     const socket = io()
     // we are storing the nickname in the body element
-// !diff(1:7) +
+// !diff(1:12) +
     const display_new_message = (data) => {
         // this is assume to be a an object (so JSON.parse before if necessary)
         const {author, recipient, content, date} = data
         const newRow = document.createElement('tr')
-        newRow.innerHTML = `<td>${date}</td><td>${author.nickname}</td><td>${recipient.nickname}</td><td>${content}</td>`
+        newRow.innerHTML = (
+            `<td>${date}</td>`
+          + `<td>${author.nickname}</td>`
+          + `<td>${recipient.nickname}</td>`
+          + `<td>${content}</td>`
+        )
         document.getElementById('messages').appendChild(newRow)
     }
     const nickname = document.body.dataset.nickname
@@ -1868,13 +1886,18 @@ so the changes are
                 body: JSON.stringify(json)
             })
             .then((response) => response.json())
-// !diff(1:8) -
+// !diff(1:13) -
             .then((data) => {
                 console.log(data)
                 // now we can diplay the author and recipient nicknames
                 const {author, recipient, content, date} = data
                 const newRow = document.createElement('tr')
-                newRow.innerHTML = `<td>${date}</td><td>${author.nickname}</td><td>${recipient.nickname}</td><td>${content}</td>`
+                newRow.innerHTML = (
+                    `<td>${date}</td>`
+                  + `<td>${author.nickname}</td>`
+                  + `<td>${recipient.nickname}</td>`
+                  + `<td>${content}</td>`
+                )
                 document.getElementById('messages').appendChild(newRow)
             })
 // !diff(1:1) +

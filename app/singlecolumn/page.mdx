@@ -16,7 +16,7 @@ the starter code in step 00 is the basic Flask `hello world` app
 !from ../app-00.py
 ```
 
-<TableOfContentsItem topic='step 01 -  connect to a database'>
+<TableOfContentsItem topic='step 01 -  connect to a database' label='01 connect to a database'>
 ### 00 -> 01 - changes in app.py
 #### connect to a SQL (sqlite) database
 
@@ -57,7 +57,7 @@ def hello_world():
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 01b -  GET /db/alive'>
+<TableOfContentsItem topic='step 01b -  GET /db/alive' label='01b GET /db/alive'>
 ### 01 -> 01b - changes in app.py
 #### first endpoint to check if the database is alive
 
@@ -127,7 +127,7 @@ if __name__ == '__main__':
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 01c -  GET /api/version'>
+<TableOfContentsItem topic='step 01c -  GET /api/version' label='01c GET /api/version'>
 ### 01b -> 01c - changes in app.py
 #### a /api/version endpoint to get the app version
 
@@ -172,7 +172,7 @@ if __name__ == '__main__':
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 02 -  create a table in the DB'>
+<TableOfContentsItem topic='step 02 -  create a table in the DB' label='02 create a table in the DB'>
 ### 01c -> 02 - changes in app.py
 #### define a table in the DB with SQLalchemy
 
@@ -230,7 +230,7 @@ with app.app_context():
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 02b -  POST /api/users to create a user'>
+<TableOfContentsItem topic='step 02b -  POST /api/users to create a user' label='02b POST /api/users to create a user'>
 ### 02 -> 02b - changes in app.py
 #### a POST endpoint to create a new user
 
@@ -297,7 +297,7 @@ if __name__ == '__main__':
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 03 -  GET /api/users to list users'>
+<TableOfContentsItem topic='step 03 -  GET /api/users to list users' label='03 GET /api/users to list users'>
 ### 02b -> 03 - changes in app.py
 #### an endpoint to GET the list of all users
 
@@ -363,7 +363,7 @@ if __name__ == '__main__':
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 04-1/3 GET /front/users'>
+<TableOfContentsItem topic='step 04 - 1/3 GET /front/users' label='04 GET /front/users'>
 ### 03 -> 04 - changes in app.py
 #### a basic frontend web page to display users
 
@@ -461,7 +461,7 @@ if __name__ == '__main__':
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 04-2/3 GET /front/users'>
+<TableOfContentsItem topic='step 04 - 2/3 GET /front/users' label=' 04 - 2/3'>
 ### 04 : new file style.css
 #### some style
 
@@ -509,7 +509,7 @@ goes in the `static` folder
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 04-3/3 GET /front/users'>
+<TableOfContentsItem topic='step 04 - 3/3 GET /front/users' label=' 04 - 3/3'>
 ### 04 : new file users.html.j2
 #### the HTML template
 
@@ -566,7 +566,7 @@ the basics for Jinja2 templating is:
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 05 -  redirect the / route to /front/users'>
+<TableOfContentsItem topic='step 05 -  redirect the / route to /front/users' label='05 redirect the / route to /front/users'>
 ### 04 -> 05 - changes in app.py
 #### how to redirect
 
@@ -622,7 +622,7 @@ def hello_world():
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 06 -  GET /api/users/&lt;id&gt; to retrieve a single user'>
+<TableOfContentsItem topic='step 06 -  GET /api/users/&lt;id&gt; to retrieve a single user' label='06 GET /api/users/&lt;id&gt; to retrieve a single user'>
 ### 05 -> 06 - changes in app.py
 #### the /api/users/*id* endpoint retrieves a user details
 
@@ -665,7 +665,7 @@ def list_user(id):
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 07 -  a SQL table for messages'>
+<TableOfContentsItem topic='step 07 -  a SQL table for messages' label='07 a SQL table for messages'>
 ### 06 -> 07 - changes in app.py
 #### a new table for storing messages
 
@@ -716,7 +716,7 @@ class Message(db.Model):
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 07b -  POST /api/messages to create a message'>
+<TableOfContentsItem topic='step 07b -  POST /api/messages to create a message' label='07b POST /api/messages to create a message'>
 ### 07 -> 07b - changes in app.py
 #### a POST endpoint to create a message
 
@@ -821,7 +821,7 @@ def create_message():
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 08 -  GET /api/messages/'>
+<TableOfContentsItem topic='step 08 -  GET /api/messages/' label='08 GET /api/messages/'>
 ### 07b -> 08 - changes in app.py
 #### a GET endpoint to retrieve all messages
 
@@ -859,7 +859,7 @@ def list_messages():
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 09 -  GET /api/users/&lt;id&gt;/messages - first draft'>
+<TableOfContentsItem topic='step 09 -  GET /api/users/&lt;id&gt;/messages - first draft' label='09 GET /api/users/&lt;id&gt;/messages - first draft'>
 ### 08 -> 09 - changes in app.py
 #### /api/users/*id*/messages : v0 **for** a user
 
@@ -930,7 +930,7 @@ def list_messages_to(recipient_id):
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 10 -  GET /api/users/&lt;id&gt;/messages: to and from user'>
+<TableOfContentsItem topic='step 10 -  GET /api/users/&lt;id&gt;/messages: to and from user' label='10 GET /api/users/&lt;id&gt;/messages: to and from user'>
 ### 09 -> 10 - changes in app.py
 #### the messages of interest for a user: also the messages **from** the user
 
@@ -987,7 +987,7 @@ def list_messages_to(recipient_id):
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 11 -  GET /api/users/&lt;id&gt;/messages: more than just ids'>
+<TableOfContentsItem topic='step 11 -  GET /api/users/&lt;id&gt;/messages: more than just ids' label='11 GET /api/users/&lt;id&gt;/messages: more than just ids'>
 ### 10 -> 11 - changes in app.py
 #### retrieving more details, like nicknames, with messages
 
@@ -1072,7 +1072,7 @@ with app.app_context():
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 12-1/2 GET /front/messages/&lt;id&gt; a front for messages'>
+<TableOfContentsItem topic='step 12 - 1/2 GET /front/messages/&lt;id&gt; a front for messages' label='12 GET /front/messages/&lt;id&gt; a front for messages'>
 ### 11 -> 12 - changes in app.py
 #### a web page to display the messages for a given user
 
@@ -1137,7 +1137,7 @@ if __name__ == '__main__':
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 12-2/2 GET /front/messages/&lt;id&gt; a front for messages'>
+<TableOfContentsItem topic='step 12 - 2/2 GET /front/messages/&lt;id&gt; a front for messages' label=' 12 - 2/2'>
 ### 12 : new file messages.html.j2
 #### the template
 
@@ -1183,7 +1183,7 @@ in this first version we just display the messages, we'll add a prompt area late
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 13-1/3 the messages web page can send messages'>
+<TableOfContentsItem topic='step 13 - 1/3 the messages web page can send messages' label='13 the messages web page can send messages'>
 ### 12 -> 13 - changes in app.py
 #### the html page has a dialog and can now also send messages
 
@@ -1243,7 +1243,7 @@ from datetime import datetime as DateTime
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 13-2/3 the messages web page can send messages'>
+<TableOfContentsItem topic='step 13 - 2/3 the messages web page can send messages' label=' 13 - 2/3'>
 ### 12 -> 13 - changes in messages.html.j2
 #### adding a form element in the template
 
@@ -1288,7 +1288,7 @@ this new version of the template:
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 13-3/3 the messages web page can send messages'>
+<TableOfContentsItem topic='step 13 - 3/3 the messages web page can send messages' label=' 13 - 3/3'>
 ### 13 : new file script.js
 #### there is a new JavaScript file
 
@@ -1328,7 +1328,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 14-1/2 the messages page displays the new message'>
+<TableOfContentsItem topic='step 14 - 1/2 the messages page displays the new message' label='14 the messages page displays the new message'>
 ### 13 -> 14 - changes in app.py
 #### no change in the app itself
 
@@ -1350,7 +1350,7 @@ from datetime import datetime as DateTime
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 14-2/2 the messages page displays the new message'>
+<TableOfContentsItem topic='step 14 - 2/2 the messages page displays the new message' label=' 14 - 2/2'>
 ### 13 -> 14 - changes in script.js
 #### also display newly created message
 
@@ -1392,7 +1392,7 @@ that
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 15-1/2 messages creation endpoint returns more details'>
+<TableOfContentsItem topic='step 15 - 1/2 messages creation endpoint returns more details' label='15 messages creation endpoint returns more details'>
 ### 14 -> 15 - changes in app.py
 #### return richer data from  POST /api/messages endpoint
 
@@ -1452,7 +1452,7 @@ from datetime import datetime as DateTime
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 15-2/2 messages creation endpoint returns more details'>
+<TableOfContentsItem topic='step 15 - 2/2 messages creation endpoint returns more details' label=' 15 - 2/2'>
 ### 14 -> 15 - changes in script.js
 #### display nicknames in newly created messages
 
@@ -1481,7 +1481,7 @@ in this version, we now receive full user info, so we need to tweak the JS accor
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 16-1/3 pouring SocketIO into the mix'>
+<TableOfContentsItem topic='step 16 - 1/3 pouring SocketIO into the mix' label='16 pouring SocketIO into the mix'>
 ### 15 -> 16 - changes in app.py
 #### enable & connect to SocketIO: the messages page connects to the backend
 
@@ -1597,7 +1597,7 @@ if __name__ == '__main__':
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 16-2/3 pouring SocketIO into the mix'>
+<TableOfContentsItem topic='step 16 - 2/3 pouring SocketIO into the mix' label=' 16 - 2/3'>
 ### 15 -> 16 - changes in script.js
 #### the frontend connects to the backend socketio server
 
@@ -1629,7 +1629,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 16-3/3 pouring SocketIO into the mix'>
+<TableOfContentsItem topic='step 16 - 3/3 pouring SocketIO into the mix' label=' 16 - 3/3'>
 ### 15 -> 16 - changes in messages.html.j2
 #### the HTML template
 
@@ -1656,7 +1656,7 @@ always we use a `<script>` tag in `<head>` to do that; we picked a CDN for that
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 17-1/3 pass current nickname to the JS code'>
+<TableOfContentsItem topic='step 17 - 1/3 pass current nickname to the JS code' label='17 pass current nickname to the JS code'>
 ### 16 -> 17 - changes in app.py
 #### subscribe to the nickname channel
 
@@ -1682,7 +1682,7 @@ from datetime import datetime as DateTime
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 17-2/3 pass current nickname to the JS code'>
+<TableOfContentsItem topic='step 17 - 2/3 pass current nickname to the JS code' label=' 17 - 2/3'>
 ### 16 -> 17 - changes in script.js
 #### retrieve nickname and subscribe to the channel
 
@@ -1725,7 +1725,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 17-3/3 pass current nickname to the JS code'>
+<TableOfContentsItem topic='step 17 - 3/3 pass current nickname to the JS code' label=' 17 - 3/3'>
 ### 16 -> 17 - changes in messages.html.j2
 #### store nickname in the HTML tree
 
@@ -1757,7 +1757,7 @@ hence this line in the HTML template:
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 18 -  new messages notified on the socketio channel'>
+<TableOfContentsItem topic='step 18 -  new messages notified on the socketio channel' label='18 new messages notified on the socketio channel'>
 ### 17 -> 18 - changes in app.py
 #### the backend writes on the nickname channel
 
@@ -1797,7 +1797,7 @@ from datetime import datetime as DateTime
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 19-1/2 display incoming messages in the frontend'>
+<TableOfContentsItem topic='step 19 - 1/2 display incoming messages in the frontend' label='19 display incoming messages in the frontend'>
 ### 18 -> 19 - changes in app.py
 #### finish it off
 
@@ -1816,7 +1816,7 @@ from datetime import datetime as DateTime
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 19-2/2 display incoming messages in the frontend'>
+<TableOfContentsItem topic='step 19 - 2/2 display incoming messages in the frontend' label=' 19 - 2/2'>
 ### 18 -> 19 - changes in script.js
 #### properly display incoming messages in the frontend
 

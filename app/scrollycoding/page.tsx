@@ -13,6 +13,10 @@ import { tokenTransitions } from "../components/annotations/token-transitions"
 import { mark } from "../components/annotations/mark"
 import { diff } from "../components//annotations/diff"
 import { className } from "../components//annotations/classname"
+import TableOfContents from "../components/tableofcontents"
+import TableOfContentsItem from "../components/tableofcontentsitem"
+
+import "../scrollycoding.css"
 
 const Schema = Block.extend({
   intro: Block,
@@ -22,8 +26,15 @@ const Schema = Block.extend({
 
 export default function Page() {
   const { intro, steps, outro } = parseRoot(Content, Schema)
+  const makeLabel = (step: string | undefined) => {
+    return (step) ? step.split(":")[0].trim() : "n/a"
+  }
+  const makeTopic = (step: string | undefined) => {
+    return (step) ? step : "n/a"
+  }
   return (
-    <main>
+    <main className="scrollycoding">
+      <TableOfContents />
       <Link href="/">Back to top</Link>
       <h1 className="mt-8">{intro.title}</h1>
       {intro.children}
@@ -37,8 +48,9 @@ export default function Page() {
               selectOn={["click", "scroll"]}
               className="border-l-4 border-zinc-700 data-[selected=true]:border-blue-400 px-5 py-2 mb-24 rounded bg-zinc-900"
             >
-              <h2 className="mt-4 text-xl">{step.title}</h2>
-              <div>{step.children}</div>
+              <TableOfContentsItem topic={makeTopic(step.title)} label={makeLabel(step.title)}>
+               <div>{step.children}</div>
+              </TableOfContentsItem>
             </Selectable>
           ))}
         </div>

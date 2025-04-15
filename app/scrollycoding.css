@@ -1,0 +1,11 @@
+main.scrollycoding {
+
+    .MuiTimeline-root {
+        width: 9em !important;
+        margin-right: 0 !important;
+
+        .MuiTypography-root {
+            padding-right: 0px;
+        }
+    }
+}

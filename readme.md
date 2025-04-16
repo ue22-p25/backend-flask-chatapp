@@ -6,6 +6,8 @@ this are the sources for a static website generated from the contents of
 
 https://github.com/ue22-p24/backend-flask-chatapp-steps
 
+that contains one commit for each of the steps illustrated in this story
+
 ## where is it ?
 
 for starters the outcome is published on

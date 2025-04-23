@@ -15,6 +15,7 @@ import difflib
 from pathlib import Path
 from argparse import ArgumentParser
 import subprocess as sp
+from dataclasses import dataclass
 
 import click
 
@@ -59,34 +60,59 @@ def defaults(path, filename, lang, comment):
     return filename, lang, comment
 
 
+# https://github.com/code-hike/codehike/issues/507#issuecomment-2821673210
+# annotations need to be within comments
+# so we need to avoid writing annotations in the middle of strings
+# typically doctings and similar
+# so the strategy is to group all the annotations *before*
+# the body itself
 class DiffWriter:
+
+    @dataclass
+    class Annotation:
+        mode: str   # '+' or '-' or '@'
+        start: int  # start of the annotation
+        end: int    # end of the annotation
+
 
     def __init__(self, comment):
         self.comment = comment
         self.mode = ' '  # could be '+', '-', ' ', or '@'
+        self.annotations = []
         self.lines = []
-
-    def flush(self):
-        match self.mode:
-            case ' ':
-                for line in self.lines:
-                    print(line)
-            case '+' | '-':
-                if self.lines:
-                    print(self.comment(f"!diff(1:{len(self.lines)}) {self.mode}"))
-                    for line in self.lines:
-                        print(line)
-            case '@':
-                if self.lines:
-                    print(self.comment(f"!className separator"))
-                    print(30*'.')
-        self.lines = []
+        self.lineno = 0
+        # for the current stream of + or -
+        self.start = 0
 
     def add_line(self, line, mode):
-        if self.mode != mode:
-            self.flush()
+        self.lineno += 1
+        match mode:
+            case '@':
+                self.annotations.append(self.Annotation(mode, self.lineno, self.lineno))
+                self.lines.append("........")
+            case '+' | '-':
+                if self.mode == mode:
+                    self.annotations[-1].end = self.lineno
+                else:
+                    self.annotations.append(self.Annotation(mode, self.lineno, self.lineno))
+                self.lines.append(line)
+            case ' ':
+                self.lines.append(line)
+
         self.mode = mode
-        self.lines.append(line)
+
+
+    def flush(self):
+        # write annotations
+        for annotation in self.annotations:
+            mode = annotation.mode
+            match mode:
+                case '+' | '-':
+                    print(self.comment(f"!diff({annotation.start}:{annotation.end}) {mode}"))
+                case '@':
+                    print(self.comment(f"!className({annotation.start}) separator"))
+        for line in self.lines:
+            print(line)
 
 
 def onefile_cat(file1, *, filename=None, lang=None, comment=None, added=True):

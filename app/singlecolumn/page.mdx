@@ -30,20 +30,20 @@ This is only boilerplate code, but it's central to the rest of the steps.
 - We configure Flask to use the DB located at `sqlite:///chat.db`
 - We create a new database object, and its `session` attribute, that will allow us to interact with said DB
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !diff(5:7) +
+# !diff(10:17) +
+........
 VERSION = "00"
-# !diff(1:1) +
 VERSION = "01"
 from flask import Flask
-# !diff(1:3) +
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
 
 ## usual Flask initilization
 app = Flask(__name__)
-# !diff(1:8) +
 
 ## DB declaration
 
@@ -94,17 +94,17 @@ http -I :5001/db/alive
 alias http='\http -I'
 ```
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(5) separator
+# !diff(7:23) +
+........
 VERSION = "01"
-# !diff(1:1) +
 VERSION = "01b"
 from flask import Flask
-# !className separator
-..............................
+........
     return f'hello, this is a chat app! (version {VERSION})'
-# !diff(1:17) +
 # try it with
 """
 http :5001/db/alive
@@ -147,17 +147,17 @@ so that one can define a breaking change in the API, and still support the previ
 http :5001/api/version
 ```
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(5) separator
+# !diff(7:15) +
+........
 VERSION = "01b"
-# !diff(1:1) +
 VERSION = "01c"
 from flask import Flask
-# !className separator
-..............................
+........
         return hed + error_text
-# !diff(1:9) +
 # try it with
 """
 http :5001/api/version
@@ -198,19 +198,19 @@ server life cycle.
   means we apply the schema to the database)
 
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(5) separator
+# !diff(9:23) +
+........
 VERSION = "01c"
-# !diff(1:1) +
 VERSION = "02"
 from flask import Flask
-# !className separator
-..............................
+........
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
 # this variable, db, will be used for all SQLAlchemy commands
 db = SQLAlchemy(app)
-# !diff(1:15) +
 
 
 ## define a table in the database
@@ -250,23 +250,23 @@ how to use SQLAlchemy to create a new row in the database:
 
 here again see the inline comments in the code for how to trigger the new endpoint
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:5) +
+# !diff(7:7) +
+# !className(10) separator
+# !diff(12:36) +
+........
 VERSION = "02"
-# !diff(1:3) +
 VERSION = "02b"
 
 import json
 from flask import Flask
-# !diff(1:1) +
 from flask import request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-# !className separator
-..............................
+........
     return dict(version=VERSION)
-# !diff(1:25) +
 # try it with
 """
 http :5001/api/users name="Alice Caroll" email="alice@foo.com" nickname="alice"
@@ -335,17 +335,17 @@ admittedly rather tedious way of doing things
 
 you know what to do
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(5) separator
+# !diff(7:18) +
+........
 VERSION = "02b"
-# !diff(1:1) +
 VERSION = "03"
 import json
-# !className separator
-..............................
+........
         return dict(error=f"{type(exc)}: {exc}"), 422
-# !diff(1:12) +
 # try it with
 """
 http :5001/api/users
@@ -411,25 +411,25 @@ Also note that this way of doing things is SSR (Server-Side rendering); relying
 on the API to implement this endpointmakes it more likely for us move to CSR
 (Client-Side rendering) in the future if need be.
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !diff(5:5) +
+# !diff(8:8) +
+# !className(11) separator
+# !diff(13:38) +
+........
 VERSION = "03"
-# !diff(1:1) +
 VERSION = "04"
 import json
-# !diff(1:1) +
 import requests
 from flask import Flask
 from flask import request
-# !diff(1:1) +
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-# !className separator
-..............................
+........
         for user in users]
-# !diff(1:26) +
 
 ## Frontend
 # for clarity we define our routes in the /front namespace
@@ -595,30 +595,30 @@ in particular about the HTTP codes, see:
 
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(10:10) +
+# !className(13) separator
+# !diff(16:16) -
+# !diff(17:19) +
+........
 VERSION = "04"
-# !diff(1:1) +
 VERSION = "05"
 import json
 import requests
-# !className separator
-..............................
+........
 from flask import Flask
 from flask import request
 from flask import render_template
-# !diff(1:1) +
 from flask import redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-# !className separator
-..............................
+........
 @app.route('/')
 def hello_world():
-# !diff(1:1) -
     return f'hello, this is a chat app! (version {VERSION})'
-# !diff(1:3) +
     # redirect to /front/users
     # actually this is just a rsponse with a 301 HTTP code
     return redirect('/front/users')
@@ -637,18 +637,18 @@ use the `get()` method to retrieve the user by its primary key
 
 (and we still need to convert the `User` object to a regular Python dictionary)
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(8:22) +
+........
 VERSION = "05"
-# !diff(1:1) +
 VERSION = "06"
 import json
 import requests
-# !className separator
-..............................
+........
         for user in users]
-# !diff(1:15) +
 # try it with
 """
 http :5001/api/users/1
@@ -691,23 +691,23 @@ this a bit, but it's helpful to understand how to deal with foreign keys in
 SQLAlchemy;
 
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !diff(5:5) +
+# !className(8) separator
+# !diff(12:19) +
+........
 VERSION = "06"
-# !diff(1:1) +
 VERSION = "07"
 import json
-# !diff(1:1) +
 from datetime import datetime as DateTime
 import requests
 from flask import Flask
-# !className separator
-..............................
+........
     name = db.Column(db.String)
     email = db.Column(db.String)
     nickname = db.Column(db.String)
-# !diff(1:8) +
 
 class Message(db.Model):
     __tablename__ = 'messages'
@@ -783,18 +783,18 @@ create-messages
 list-users
 ```
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(8:32) +
+........
 VERSION = "07"
-# !diff(1:1) +
 VERSION = "07b"
 import json
 from datetime import datetime as DateTime
-# !className separator
-..............................
+........
         return dict(error=f"{type(exc)}: {exc}"), 422
-# !diff(1:25) +
 # try it with
 """
 http :5001/api/messages author_id=1 recipient_id=2 content="trois petits chats"
@@ -833,18 +833,18 @@ super straightforward step, just retrieve all messages
 
 not very useful actually, but only for completeness.
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(8:20) +
+........
 VERSION = "07b"
-# !diff(1:1) +
 VERSION = "08"
 import json
 from datetime import datetime as DateTime
-# !className separator
-..............................
+........
         return dict(error=f"{type(exc)}: {exc}"), 422
-# !diff(1:13) +
 # try it with
 """
 http :5001/api/messages
@@ -895,19 +895,19 @@ in a practical app, we would probably need to return **BOTH** messsages that hav
 
 but let's not get ahead of ourselves, we will improve all this later on
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(9:30) +
+........
 VERSION = "08"
-# !diff(1:1) +
 VERSION = "09"
 import json
 from datetime import datetime as DateTime
-# !className separator
-..............................
+........
             author_id=message.author_id, recipient_id=message.recipient_id)
         for message in messages]
-# !diff(1:22) +
 
 # try it with
 """
@@ -944,33 +944,34 @@ meaning that we need to write a little more elaborate filter, and look for messa
 which in logical terms amounts to doing a `OR` between the two conditions  
 hence the import of the `or_` function from SQLAlchemy, that will allow us to combine the two conditions
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(9:9) +
+# !className(12) separator
+# !diff(15:19) -
+# !diff(20:30) +
+# !diff(32:32) -
+........
 VERSION = "09"
-# !diff(1:1) +
 VERSION = "10"
 import json
 from datetime import datetime as DateTime
-# !className separator
-..............................
+........
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-# !diff(1:1) +
 from sqlalchemy.sql import or_
 ## usual Flask initilization
 app = Flask(__name__)
-# !className separator
-..............................
+........
 @app.route('/api/users/<int:recipient_id>/messages', methods=['GET'])
 def list_messages_to(recipient_id):
-# !diff(1:5) -
     """"
     returns only the messages to a given person
     a first naive approach is to filter all messages by recipient_id
     """"
     messages = Message.query.filter_by(recipient_id=recipient_id).all()
-# !diff(1:11) +
     """
     returns only messages to and from a given person
     need to write a little more elaborate query
@@ -983,7 +984,6 @@ def list_messages_to(recipient_id):
         )
     ).all()
     return [
-# !diff(1:1) -
         # rebuild dict (JSON-able) objects from the SQLAlchemy objects
         dict(
             id=message.id,
@@ -1031,39 +1031,39 @@ so in the `/api/users/<id>/messages` endpoint, we add a `author` and a
 `recipient_id` keys that can now be retrieved through the `author` and
 `recipient` relationships)
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(9:11) +
+# !className(14) separator
+# !diff(18:19) +
+# !diff(23:24) -
+# !diff(25:30) +
+........
 VERSION = "10"
-# !diff(1:1) +
 VERSION = "11"
 import json
 from datetime import datetime as DateTime
-# !className separator
-..............................
+........
     recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     date = db.Column(db.DateTime)
-# !diff(1:3) +
     # Define relationships (to fetch User objects directly)
     author = db.relationship('User', foreign_keys=[author_id], backref='sent_messages')
     recipient = db.relationship('User', foreign_keys=[recipient_id], backref='received_messages')
 # actually create the database (i.e. tables etc)
 with app.app_context():
-# !className separator
-..............................
+........
             Message.recipient_id==recipient_id,
         )
     ).all()
-# !diff(1:2) +
     # now we have in message.author and message.recipient
     # the actual User objects
     return [
         dict(
             id=message.id,
-# !diff(1:2) -
             author_id=message.author_id,
             recipient_id=message.recipient_id,
-# !diff(1:6) +
             author = dict(
                 id=message.author.id, name=message.author.name,
                 email=message.author.email, nickname=message.author.nickname),
@@ -1099,18 +1099,18 @@ at this point, the main default is, we don't see incoming messages as they are
 posted; the user needs to refresh the page to see new messages; a bit of
 patience...
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(8:32) +
+........
 VERSION = "11"
-# !diff(1:1) +
 VERSION = "12"
 import json
 from datetime import datetime as DateTime
-# !className separator
-..............................
+........
     return render_template('users.html.j2', users=users, version=VERSION)
-# !diff(1:25) +
 # try it by pointing your browser to
 """
 http://localhost:5001/front/messages/1
@@ -1210,30 +1210,31 @@ and fixed in the next step:
 the page does not refresh after sending a message; i.e. the new message is not
 displayed in the list of messages
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(10:10) +
+# !className(14) separator
+# !diff(18:21) +
+# !diff(25:25) +
+........
 VERSION = "12"
-# !diff(1:1) +
 VERSION = "13"
 import json
 from datetime import datetime as DateTime
-# !className separator
-..............................
+........
         author_id = parameters['author_id']
         recipient_id = parameters['recipient_id']
         date = DateTime.now()
-# !diff(1:1) +
         print("received request to create message", author_id, recipient_id, content)
         new_message = Message(content=content, date=date,
                               author_id=author_id, recipient_id=recipient_id)
         db.session.add(new_message)
-# !className separator
-..............................
+........
         return dict(error="could not request messages list", url=url,
                     status=req2.status_code, text=req2.text)
     messages = req2.json()
-# !diff(1:4) +
     # not trying to optimize for now
     url = request.url_root + '/api/users'
     req3 = requests.get(url)
@@ -1241,7 +1242,6 @@ from datetime import datetime as DateTime
     return render_template(
         'messages.html.j2',
         user=user, messages=messages,
-# !diff(1:1) +
         users=users,
     )
 ```
@@ -1259,22 +1259,22 @@ this new version of the template:
   - a `<select>` tag for the recipient
   - a `<input>` tag for the content, typed as `text`
 ```html messages.html.j2
-<!-- !className separator -->
-..............................
+<!-- !className(1) separator -->
+<!-- !diff(5:5) + -->
+<!-- !className(9) separator -->
+<!-- !diff(13:24) + -->
+........
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="/static/style.css">
-<!-- !diff(1:1) + -->
         <script type="text/javascript" src="/static/script.js"></script>
     </head>
     <body>
         <a href="/">Back to the main page</a>
-<!-- !className separator -->
-..............................
+........
                 </tr>
             {% endfor %}
         </table>
-<!-- !diff(1:12) + -->
         <form id="send-form" action="/api/messages" method="post">
             <input type="hidden" name="author_id" value="{{user.id}}">
             <label for="recipient">Recipient:</label>
@@ -1343,11 +1343,11 @@ just the version number
 at this point in time, the data returned by the API about the newly created
 message only contains user ids, not the user details like nicknames
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+........
 VERSION = "13"
-# !diff(1:1) +
 VERSION = "14"
 import json
 from datetime import datetime as DateTime
@@ -1372,12 +1372,12 @@ that
 - if the response is a success, we create a new row in the messages table
 - and if not we use a `.catch()` to log the error in the console
 ```js script.js
-// !className separator
-..............................
+// !className(1) separator
+// !diff(5:22) +
+........
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(json)
             })
-// !diff(1:18) +
             .then((response) => response.json())
             .then((data) => {
                 console.log(data)
@@ -1425,20 +1425,21 @@ made aware of incoming messages
 without the addition of websockets, the front would need to poll the API for
 that...
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(10:12) +
+# !diff(19:24) +
+........
 VERSION = "14"
-# !diff(1:1) +
 VERSION = "15"
 import json
 from datetime import datetime as DateTime
-# !className separator
-..............................
+........
         content = parameters['content']
         author_id = parameters['author_id']
         recipient_id = parameters['recipient_id']
-# !diff(1:3) +
         # check that author and recipient exist
         author = User.query.get(author_id)
         recipient = User.query.get(recipient_id)
@@ -1448,7 +1449,6 @@ from datetime import datetime as DateTime
                               author_id=author_id, recipient_id=recipient_id)
         db.session.add(new_message)
         db.session.commit()
-# !diff(1:6) +
         # expose more details in the response
         parameters['author'] = dict(
             id=author.id, name=author.name, email=author.email, nickname=author.nickname)
@@ -1467,25 +1467,25 @@ from datetime import datetime as DateTime
 
 in this version, we now receive full user info, so we need to tweak the JS accordingly
 ```js script.js
-// !className separator
-..............................
+// !className(1) separator
+// !diff(5:7) -
+// !diff(8:9) +
+// !diff(13:14) -
+// !diff(15:16) +
+........
             .then((response) => response.json())
             .then((data) => {
                 console.log(data)
-// !diff(1:3) -
                 // at this point the return of /api/messages is its parameters
                 // so we don't know the author and recipient nicknames
                 const {author_id, recipient_id, content, date} = data
-// !diff(1:2) +
                 // now we can diplay the author and recipient nicknames
                 const {author, recipient, content, date} = data
                 const newRow = document.createElement('tr')
                 newRow.innerHTML = (
                     `<td>${date}</td>`
-// !diff(1:2) -
                   + `<td>${author_id}</td>`
                   + `<td>${recipient_id}</td>`
-// !diff(1:2) +
                   + `<td>${author.nickname}</td>`
                   + `<td>${recipient.nickname}</td>`
                   + `<td>${content}</td>`
@@ -1564,35 +1564,37 @@ all this means that, when the web page is loaded:
 of course all this traffic is purely for educational purposes, and is not
 required for the app to work properly
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(10:10) +
+# !className(13) separator
+# !diff(16:16) +
+# !className(18) separator
+# !diff(21:29) +
+# !diff(31:31) -
+# !diff(32:32) +
+........
 VERSION = "15"
-# !diff(1:1) +
 VERSION = "16"
 import json
 from datetime import datetime as DateTime
-# !className separator
-..............................
+........
 from flask import request
 from flask import render_template
 from flask import redirect
-# !diff(1:1) +
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-# !className separator
-..............................
+........
 ## usual Flask initilization
 app = Flask(__name__)
-# !diff(1:1) +
 socketio = SocketIO(app)
 ## DB declaration
-# !className separator
-..............................
+........
         users=users,
     )
-# !diff(1:9) +
 #
 # cannot be triggered through http
 # there is a socket-io CLI client that can be installed with
@@ -1603,9 +1605,7 @@ socketio = SocketIO(app)
 def connect_ack(message):
     print(f'received ACK message: {message} of type {type(message)}')
 if __name__ == '__main__':
-# !diff(1:1) -
     app.run()
-# !diff(1:1) +
     socketio.run(app)
 ```
 
@@ -1623,13 +1623,13 @@ upon document loading, the JS code will
 - and so this is how the frontend will send an acknowledgment to the backend
   upon successful connection
 ```js script.js
-// !className separator
-..............................
+// !className(1) separator
+// !diff(4:4) -
+// !diff(5:10) +
+........
 const formToJSON = form => Object.fromEntries(new FormData(form))
 document.addEventListener('DOMContentLoaded', async (event) => {
-// !diff(1:1) -
     console.log("loading custom script")
-// !diff(1:6) +
     console.log("connecting to the SocketIO backend")
     const socket = io()
     socket.on('connect', () => {
@@ -1649,19 +1649,19 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 this is the place where we add the SocketIO client-side code into the mix; as
 always we use a `<script>` tag in `<head>` to do that; we picked a CDN for that
 ```html messages.html.j2
-<!-- !className separator -->
-..............................
+<!-- !className(1) separator -->
+<!-- !diff(5:9) + -->
+<!-- !diff(11:11) + -->
+........
     <head>
         <link rel="stylesheet" type="text/css" href="/static/style.css">
         <script type="text/javascript" src="/static/script.js"></script>
-<!-- !diff(1:5) + -->
         <!-- the socket.io library is used to connect to the ws endpoints on the server -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
             integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
             crossorigin="anonymous">
         </script>
     </head>
-<!-- !diff(1:1) + -->
 
     <body>
         <a href="/">Back to the main page</a>
@@ -1684,11 +1684,11 @@ we have 2 options here:
 of course this version is not functional yet, as nobody writes on that
 channel yet... but we'll fix it later
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+........
 VERSION = "16"
-# !diff(1:1) +
 VERSION = "17"
 import json
 from datetime import datetime as DateTime
@@ -1710,22 +1710,22 @@ line, that inspects the `data-` attributes in the body tag of the HTML page:
 and from there, we can simply subscribe to the nickname channel, using the
 `socket.on()` method like before
 ```js script.js
-// !className separator
-..............................
+// !className(1) separator
+// !diff(5:6) +
+// !diff(9:9) -
+// !diff(10:10) +
+// !diff(12:17) +
+........
 document.addEventListener('DOMContentLoaded', async (event) => {
     console.log("connecting to the SocketIO backend")
     const socket = io()
-// !diff(1:2) +
     // we are storing the nickname in the body element
     const nickname = document.body.dataset.nickname
     socket.on('connect', () => {
         console.log('Connected!')
-// !diff(1:1) -
         socket.emit('connect-ack', {messages: 'I\'m connected!'})
-// !diff(1:1) +
         socket.emit('connect-ack', {messages: `${nickname} has connected!`})
     })
-// !diff(1:6) +
     // so we can subscribe to that channel
     socket.on(nickname, (data) => {
         // the backend does not yet send anything to this channel, but anticipating a bit...
@@ -1756,13 +1756,13 @@ hence this line in the HTML template:
 <body data-nickname="{{ user.nickname }}">
 ```
 ```html messages.html.j2
-<!-- !className separator -->
-..............................
+<!-- !className(1) separator -->
+<!-- !diff(4:4) - -->
+<!-- !diff(5:5) + -->
+........
         </script>
     </head>
-<!-- !diff(1:1) - -->
     <body>
-<!-- !diff(1:1) + -->
     <body data-nickname="{{user.nickname}}">
         <a href="/">Back to the main page</a>
         <h1>The messages for user {{user.nickname}} ({{user.name}})</h1>
@@ -1784,20 +1784,20 @@ so the `/api/messages` endpoint just goes on doing this once it is done:
 
 the only thing remaining is for the frontend to use that data to reresh its page
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+# !className(6) separator
+# !diff(10:15) +
+........
 VERSION = "17"
-# !diff(1:1) +
 VERSION = "18"
 import json
 from datetime import datetime as DateTime
-# !className separator
-..............................
+........
         parameters['recipient'] = dict(
             id=recipient.id, name=recipient.name, email=recipient.email, nickname=recipient.nickname)
         parameters['date'] = date
-# !diff(1:6) +
         # we might have considered writing this
         # socket.emit(recipient.nickname, json.dumps(parameters))
         # however it won't work as-is because of the datetime filed which is not serializable
@@ -1818,11 +1818,11 @@ the last ring of changes is concentrated in the JS code
 
 and this time the app is totally functional !
 ```python app.py
-# !className separator
-..............................
-# !diff(1:1) -
+# !className(1) separator
+# !diff(2:2) -
+# !diff(3:3) +
+........
 VERSION = "18"
-# !diff(1:1) +
 VERSION = "19"
 import json
 from datetime import datetime as DateTime
@@ -1847,12 +1847,17 @@ so the changes are
     socket.on(nickname, (str) => display_new_message(JSON.parse(str)))
 ```
 ```js script.js
-// !className separator
-..............................
+// !className(1) separator
+// !diff(5:16) +
+// !diff(23:26) -
+// !diff(27:27) +
+// !className(31) separator
+// !diff(35:47) -
+// !diff(48:48) +
+........
     console.log("connecting to the SocketIO backend")
     const socket = io()
     // we are storing the nickname in the body element
-// !diff(1:12) +
     const display_new_message = (data) => {
         // this is assume to be a an object (so JSON.parse before if necessary)
         const {author, recipient, content, date} = data
@@ -1871,22 +1876,18 @@ so the changes are
         socket.emit('connect-ack', {messages: `${nickname} has connected!`})
     })
     // so we can subscribe to that channel
-// !diff(1:4) -
     socket.on(nickname, (data) => {
         // the backend does not yet send anything to this channel, but anticipating a bit...
         alert(`received ${data} from socketio on the ${nickname} channel`)
     })
-// !diff(1:1) +
     socket.on(nickname, (str) => display_new_message(JSON.parse(str)))
     console.log(`subscribed to the ${nickname} channel`)
     document.getElementById('send-form').addEventListener('submit',
         async (event) => {
-// !className separator
-..............................
+........
                 body: JSON.stringify(json)
             })
             .then((response) => response.json())
-// !diff(1:13) -
             .then((data) => {
                 console.log(data)
                 // now we can diplay the author and recipient nicknames
@@ -1900,7 +1901,6 @@ so the changes are
                 )
                 document.getElementById('messages').appendChild(newRow)
             })
-// !diff(1:1) +
             .then(display_new_message)
             .catch((error) => {
                 console.error('Error:', error)

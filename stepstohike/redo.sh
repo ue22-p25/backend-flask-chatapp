@@ -42,13 +42,13 @@ function togit() {
 # compute AUTO in singlecolumn
 function toauto-1() {
     local out=$APP/singlecolumn/AUTO
-    python $BIN/tocodehike.py chain-dirs --all-files ${STEPS}/.steps/* > $out
+    python $BIN/stepstohike.py chain-dirs --all-files ${STEPS}/.steps/* > $out
     echo single column output written in $out
 }
 # compute AUTO in scrollycoding
 function toauto-2() {
     local out=$APP/scrollycoding/AUTO
-    python $BIN/tocodehike.py chain-dirs --all-files --scrolly ${STEPS}/.steps/* > $out
+    python $BIN/stepstohike.py chain-dirs --all-files --scrolly ${STEPS}/.steps/* > $out
     echo double column output written in $out
 }
 # both
@@ -98,12 +98,12 @@ function savegit() {
 TESTSTEPS=${STEPS}/.steps/0[0-4]*
 function testauto-1() {
     local out=$APP/singlecolumn/AUTO
-    python $BIN/tocodehike.py chain-dirs --all-files $TESTSTEPS > $out
+    python $BIN/stepstohike.py chain-dirs --all-files $TESTSTEPS > $out
     echo single column output written in $out
 }
 function testauto-2() {
     local out=$APP/scrollycoding/AUTO
-    python $BIN/tocodehike.py chain-dirs --all-files --scrolly $TESTSTEPS > $out
+    python $BIN/stepstohike.py chain-dirs --all-files --scrolly $TESTSTEPS > $out
     echo double column output written in $out
 }
 function testauto() {

@@ -14,7 +14,7 @@ body {
 }
 
 /* 
- * tocodehike separate diff chunks with a line that reads
+ * stepstohike separate diff chunks with a line that reads
  * # !className separator
  * ......
  * this way if the class is not present, the separator will wtill show somehow

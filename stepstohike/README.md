@@ -79,10 +79,10 @@ steps.py diff-branches <git_repo> <branch1> <branch2>
 as of now this is relevant only if both branches have the same steps (no
 re-syncing yet
 
-## from folders to codehike (tocodehike,py)
+## from folders to codehike (stepstohike,py)
 
 ```
-./tocodehike.py chain-dirs [--scolly] steps-repo/.steps/*
+./stepstohike.py chain-dirs [--scolly] steps-repo/.steps/*
 ```
 
 will write on stdout the codehike input  
@@ -97,7 +97,7 @@ redo.sh all
 ```
 
 will
-- clone the upstream repo `ue22-p24/flask-chatapp-steps` under `tocodehike/steps-repo`
+- clone the upstream repo `ue22-p24/flask-chatapp-steps` under `stepstohike/steps-repo`
 - run the `tofolders` command above to explode this repo into a folder
-- invoke `tocodehike.py` to produce the codehike input
+- invoke `stepstohike.py` to produce the codehike input
 - run `fillauto.py` to fill the .j2 templates and produce the final `.mdx` input to codehike

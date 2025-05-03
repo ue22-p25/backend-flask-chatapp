@@ -278,7 +278,7 @@ def tofolders(git_repo: Path, output_root: Path) -> list[Path]:
             step_md = folder / "step.md"
             if not step_md.exists():
                 with step_md.open('w') as f:
-                    f.write(f"{message}\n")
+                    f.write(f"# {message}\n")
         parent = git_shell(f"log --pretty='%p' -n 1 {commit}")
         if not parent or parent == commit:
             break

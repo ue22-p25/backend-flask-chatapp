@@ -368,6 +368,9 @@ def diff_branches(repo: Path, branch1: str, branch2: str) -> ShellSuccess:
             info(f"{h2}: {s2} - {m2}")
             info(command)
             print(output.stdout.decode())
+            # for smooth mixing with stderr where the context 
+            # (step, file, ..) is printed
+            sys.stdout.flush()
 
 
 if __name__ == '__main__':

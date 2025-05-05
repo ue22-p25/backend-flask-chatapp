@@ -97,7 +97,7 @@ const TableOfContents: FC<Props> = () => {
                 color='secondary'
                 variant={section.isActive ? 'filled' : 'outlined'}
               />
-              <Tooltip title={section.tooltip} arrow>
+              <Tooltip title={section.tooltip} arrow placement="left">
                 <TimelineContent>
                   <span
                     onClick={() => {

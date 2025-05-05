@@ -18,8 +18,8 @@ the starter code in step 00 is the basic Flask `hello world` app
 !from ../app-00.py
 ```
 
-<TableOfContentsItem topic='step 01 -  connect to a database' label='01 connect to a database'>
-### 00 -> 01 - changes in app.py
+<TableOfContentsItem topic='step 01a -  connect to a database' label='01a connect to a database'>
+### 00 -> 01a - changes in app.py
 #### connect to a SQL (sqlite) database
 
 Let's start with empowering our Flask app with a SQL database.
@@ -60,7 +60,7 @@ def hello_world():
 
 </TableOfContentsItem>
 <TableOfContentsItem topic='step 01b -  GET /db/alive' label='01b GET /db/alive'>
-### 01 -> 01b - changes in app.py
+### 01a -> 01b - changes in app.py
 #### first endpoint to check if the database is alive
 
 
@@ -174,8 +174,8 @@ if __name__ == '__main__':
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 02 -  create a table in the DB' label='02 create a table in the DB'>
-### 01c -> 02 - changes in app.py
+<TableOfContentsItem topic='step 02a -  create a table in the DB' label='02a create a table in the DB'>
+### 01c -> 02a - changes in app.py
 #### define a table in the DB with SQLalchemy
 
 ### the `User` table
@@ -233,7 +233,7 @@ with app.app_context():
 
 </TableOfContentsItem>
 <TableOfContentsItem topic='step 02b -  POST /api/users to create a user' label='02b POST /api/users to create a user'>
-### 02 -> 02b - changes in app.py
+### 02a -> 02b - changes in app.py
 #### a POST endpoint to create a new user
 
 ### rows creation
@@ -671,8 +671,8 @@ def list_user(id):
 ```
 
 </TableOfContentsItem>
-<TableOfContentsItem topic='step 07 -  a SQL table for messages' label='07 a SQL table for messages'>
-### 06 -> 07 - changes in app.py
+<TableOfContentsItem topic='step 07a -  a SQL table for messages' label='07a a SQL table for messages'>
+### 06 -> 07a - changes in app.py
 #### a new table for storing messages
 
 In this very rustic app, a message is simply a text sent from one user (the author) to another one (the recipient)
@@ -723,7 +723,7 @@ class Message(db.Model):
 
 </TableOfContentsItem>
 <TableOfContentsItem topic='step 07b -  POST /api/messages to create a message' label='07b POST /api/messages to create a message'>
-### 07 -> 07b - changes in app.py
+### 07a -> 07b - changes in app.py
 #### a POST endpoint to create a message
 
 nothing new here as compared to users; except the minor point that the `date`

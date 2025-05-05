@@ -7,13 +7,14 @@ import { FC, ReactNode } from 'react'
 interface Props {
   topic: string
   label: string
+  tooltip?: string
   children: ReactNode
 }
 
-const TableOfContentsItem: FC<Props> = ({ topic, label, children }) => {
+const TableOfContentsItem: FC<Props> = ({ topic, label, tooltip, children }) => {
   return (
     // keep as is
-    <section id={label} className='section-heading'>
+    <section id={label} className='section-heading' data-tooltip={tooltip}>
       <h2>{topic}</h2>
       <div>{children}</div>
     </section>
@@ -21,4 +22,3 @@ const TableOfContentsItem: FC<Props> = ({ topic, label, children }) => {
 }
 
 export default TableOfContentsItem
-

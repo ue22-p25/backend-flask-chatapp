@@ -297,7 +297,7 @@ def onedir_diff(dir1, dir2, only_git):
         info(f"changes in file: {file}")
         topic, label = heading_details(file, nth, total)
         if not SCROLLY:
-            print(f"<TableOfContentsItem topic='{topic}' label='{label}'>")
+            print(f"<TableOfContentsItem topic='{topic}' label='{label}' tooltip='changes in {file}'>")
         handle_step(path2 / file, old_dir=d1, new_dir=d2, nth=nth, total=total)
         onefile_diff(path1 / file, path2 / file)
         if not SCROLLY:
@@ -305,13 +305,13 @@ def onedir_diff(dir1, dir2, only_git):
 
 
     def handle_new_file(file, nth, total):
-        info(f"new file: {file2}")
+        info(f"new file: {file}")
         topic, label = heading_details(file, nth, total)
 
         if not SCROLLY:
-            print(f"<TableOfContentsItem topic='{topic}' label='{label}'>")
+            print(f"<TableOfContentsItem topic='{topic}' label='{label}' tooltip='new file {file}'>")
         handle_step(path2 / file, new_dir=d2, nth=nth, total=total)
-        onefile_cat(path2 / file2, added=True)
+        onefile_cat(path2 / file, added=True)
         if not SCROLLY:
             print(f"</TableOfContentsItem>")
 

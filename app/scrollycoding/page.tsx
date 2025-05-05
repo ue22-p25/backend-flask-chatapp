@@ -26,6 +26,7 @@ const Schema = Block.extend({
 
 export default function Page() {
   const { intro, steps, outro } = parseRoot(Content, Schema)
+
   const makeLabel = (step: string | undefined) => {
     return (step) ? step.split(":")[0].trim() : "n/a"
   }
@@ -48,7 +49,7 @@ export default function Page() {
               selectOn={["click", "scroll"]}
               className="border-l-4 border-zinc-700 data-[selected=true]:border-blue-400 px-5 py-2 mb-24 rounded bg-zinc-900"
             >
-              <TableOfContentsItem topic={makeTopic(step.title)} label={makeLabel(step.title)}>
+              <TableOfContentsItem topic={makeTopic(step.title)} label={makeLabel(step.title)} tooltip={step.title}>
                <div>{step.children}</div>
               </TableOfContentsItem>
             </Selectable>

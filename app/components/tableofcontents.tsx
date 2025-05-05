@@ -8,11 +8,14 @@ import Timeline from '@mui/lab/Timeline'
 import TimelineItem from '@mui/lab/TimelineItem'
 import TimelineContent from '@mui/lab/TimelineContent'
 import TimelineDot from '@mui/lab/TimelineDot'
+import { Tooltip } from '@mui/material'
+
 
 interface Props {}
 
 interface Section {
   topic: string
+  tooltip: string
   boundingTop: number
   isActive: boolean
 }
@@ -40,6 +43,7 @@ const TableOfContents: FC<Props> = () => {
 
       return {
         topic: el.getAttribute('id')!,
+        tooltip: el.getAttribute('data-tooltip')!,
         boundingTop,
         isActive: index === 0,
       }
@@ -93,25 +97,27 @@ const TableOfContents: FC<Props> = () => {
                 color='secondary'
                 variant={section.isActive ? 'filled' : 'outlined'}
               />
-              <TimelineContent>
-                <span
-                  onClick={() => {
-                    window.scrollTo(0, section.boundingTop - marginTop)
-                    setOffsetY(section.boundingTop - marginTop)
-                  }}
-                  style={{
-                    textDecoration: 'none',
-                    // color: section.isActive
-                    //   ? customTheme.palette.secondary.main
-                    //   : customTheme.palette.text.primary,
-                    color: section.isActive ? 'goldenrod' : 'var(--color-pink)',
-                    // textTransform: 'capitalize',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {section.topic}
-                </span>
-              </TimelineContent>
+              <Tooltip title={section.tooltip} arrow>
+                <TimelineContent>
+                  <span
+                    onClick={() => {
+                      window.scrollTo(0, section.boundingTop - marginTop)
+                      setOffsetY(section.boundingTop - marginTop)
+                    }}
+                    style={{
+                      textDecoration: 'none',
+                      // color: section.isActive
+                      //   ? customTheme.palette.secondary.main
+                      //   : customTheme.palette.text.primary,
+                      color: section.isActive ? 'goldenrod' : 'var(--color-pink)',
+                      // textTransform: 'capitalize',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {section.topic}
+                  </span>
+                </TimelineContent>
+              </Tooltip>
             </TimelineItem>
           )
         })}

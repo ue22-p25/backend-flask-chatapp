@@ -131,9 +131,9 @@ def free_branchname(repo: Path, branch_name: str) -> str:
 @click.option("--quiet", is_flag=True, help="enable debug output")
 def cli(debug, quiet):
     if debug:
-        logging.basicConfig(level=logging.DEBUG)
+        logging.getLogger().setLevel(logging.DEBUG)
     if quiet:
-        logging.basicConfig(level=logging.WARNING)
+        logging.getLogger().setLevel(logging.WARNING)
 
 
 # 0 means success and anything else means failure
@@ -206,7 +206,8 @@ def togit(branch_name, input_steps_folder, repo: Path) -> ShellSuccess:
         # the solution might be with having a .gitignore despite all...
         debug(f"{step=} {step_path=} {files_str=}")
         completed = shell( f"tar -C {step_path} -cf - {files_str} | tar -C {repo.absolute()} -xf -")
-        message = strip_docstring(Path("app.py"))
+        # message = strip_docstring(Path("main.py"))
+        message = ""
         if not message:
             _, message = retrieve_message_from_step_md(repo)
         if not message:
@@ -283,7 +284,7 @@ def tofolders(git_repo: Path, output_root: Path) -> list[Path]:
         if not parent or parent == commit:
             break
         commit = parent
-    # return them in the order that chain0-dirs would expect, older first
+    # return them in the order that chain-dirs would expect, older first
     return folders[::-1]
 
 

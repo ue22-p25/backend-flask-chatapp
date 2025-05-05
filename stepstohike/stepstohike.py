@@ -17,47 +17,54 @@ from argparse import ArgumentParser
 import subprocess as sp
 from dataclasses import dataclass
 
+import logging
+logger = logging.getLogger('steps')
+logging.basicConfig(level=logging.INFO)
+
+(debug, info, warning, error) = logger.debug, logger.info, logger.warning, logger.error
+
 import click
 
 # when generating for scrolly coding, the output syntax is a little different
 SCROLLY = False
+# by default, we add a (sub)step for each file that is new or that has a change
+# with this set to True, we only add a step if the change is described in a -step.md
+ONLY_CHANGES_WITH_STEP = False
 
 
 EXTENSIONS = {
-    '.py' : { 'lang': 'python', 'comment': lambda line: f"# {line}"},
-    '.js' : { 'lang': 'js', 'comment': lambda line: f"// {line}"},
-    '.css': { 'lang': 'css', 'comment': lambda line: f"/* {line} */"},
-    '.html': { 'lang': 'html', 'comment': lambda line: f"<!-- {line} -->"},
-    '.text': { 'lang': 'text', 'comment': lambda line: f"{line}"},
-    # quick and dirty - need only for html at this point
-    # xxx should probably need to support e.g. .html/j2 and .js.j2
-    '.j2': { 'lang': 'html', 'comment': lambda line: f"<!-- {line} -->"},
+    'requirements.txt': { 'lang': 'python', 'comment': lambda line: f"# {line}"},
+    '.gitignore': { 'lang': 'python', 'comment': lambda line: f"# {line}"},
+    '*.py' : { 'lang': 'python', 'comment': lambda line: f"# {line}"},
+    '*.js' : { 'lang': 'js', 'comment': lambda line: f"// {line}"},
+    '*.css': { 'lang': 'css', 'comment': lambda line: f"/* {line} */"},
+    '*.html': { 'lang': 'html', 'comment': lambda line: f"<!-- {line} -->"},
+    '*.text': { 'lang': 'text', 'comment': lambda line: f"{line}"},
+    '*.html.j2': { 'lang': 'html', 'comment': lambda line: f"<!-- {line} -->"},
 }
-
-def add_lang_index():
-    global EXTENSIONS
-    for ext, info in list(EXTENSIONS.items()):
-        lang = info['lang']
-        if lang not in EXTENSIONS:
-            EXTENSIONS[lang] = info
-
-add_lang_index()
 
 
 def defaults(path, filename, lang, comment):
     """
-    Assign defaults for filename, lang, and comment based on the file extension.
+    Assign defaults for filename, lang, and comment based on path's name
+    In general, all three are optional, however the caller may wish to specify any of these
     """
-    if filename is None:
-        filename = path.name
-    suffix = Path(filename).suffix
-    extension = EXTENSIONS.get(suffix, {}) or EXTENSIONS.get(lang, {})
-    lang = lang or extension.get('lang', 'text')
+    for k, v in EXTENSIONS.items():
+        if path.match(k):
+            def_lang = v['lang']
+            def_comment = v['comment']
+            break
+    else:
+        # no match, so use the default
+        # which should probably be 'text'
+        # but https://github.com/code-hike/codehike/issues/514
+        def_lang = 'python'
+        def_comment = lambda line: f"# {line}"
+    def_filename = path.name
     if comment and isinstance(comment, str):
         comment_str = comment
         comment = lambda line: f"{comment_str} {line}"
-    comment = comment or extension.get('comment', lambda line: line)
-    return filename, lang, comment
+    return filename or def_filename, lang or def_lang, comment or def_comment
 
 
 # https://github.com/code-hike/codehike/issues/507#issuecomment-2821673210
@@ -123,7 +130,7 @@ def onefile_cat(file1, *, filename=None, lang=None, comment=None, added=True):
     """
     path1 = Path(file1)
     if not path1.exists():
-        print(f"File {path1} does not exist.", sys.stderr)
+        error(f"File {path1} does not exist.")
         return
     # assign from args or compute defaults
     filename, lang, comment = defaults(path1, filename, lang, comment)
@@ -149,7 +156,7 @@ def onefile_diff(file1, file2, *, filename=None, lang=None, comment=None):
     path1, path2 = Path(file1), Path(file2)
     for path in [path1, path2]:
         if not path.exists():
-            print(f"File {path} does not exist.", sys.stderr)
+            error(f"File {path} does not exist.")
             return
     # assign from args or compute defaults
     filename, lang, comment = defaults(path1, filename, lang, comment)
@@ -198,7 +205,7 @@ def onedir_diff(dir1, dir2, only_git):
     path1, path2 = Path(dir1), Path(dir2)
     for path in [path1, path2]:
         if not path.exists():
-            print(f"Directory {path} does not exist.", sys.stderr)
+            error(f"Directory {path} does not exist.")
             return
     d1, d2 = path1.name, path2.name
     # consider only files under git
@@ -213,7 +220,7 @@ def onedir_diff(dir1, dir2, only_git):
 
     global_step = dir2 / "step.md"
     if not global_step.exists():
-        print(f"!!! WARNING !!! File {global_step} does not exist!", file=sys.stderr)
+        warning(f"File {global_step} does not exist!")
         dir_readme = "no dir readme !"
     else:
         with global_step.open() as f:
@@ -224,6 +231,8 @@ def onedir_diff(dir1, dir2, only_git):
     # ignore step.md in the list of files
     files1 = [f for f in files1 if not f.lower().endswith('step.md')]
     files2 = [f for f in files2 if not f.lower().endswith('step.md')]
+    debug(f"files1: {files1}")
+    debug(f"files2: {files2}")
 
     same_files =  sorted(set(files1) & set(files2))
     # discard files that are the same
@@ -233,7 +242,7 @@ def onedir_diff(dir1, dir2, only_git):
 
     def handle_first_line(line, name, d1, d2, nth, total):
         if not line.startswith('## '):
-            print(f"!!! WARNING !!! README file {global_step} does not start with ##", file=sys.stderr)
+            warning(f"README file {global_step} does not start with ##")
             title = "!!! MISSING TITLE in {d2}/{name} !!!"
         else:
             title = line[3:].strip()
@@ -252,7 +261,10 @@ def onedir_diff(dir1, dir2, only_git):
 
         print(f"#### {title}")
 
-    def handle_readme(path, *, new_dir, nth, total=None, old_dir=None):
+    def has_step(path, *, new_dir):
+        return (path.parent / (path.name + '-step.md')).exists()
+
+    def handle_step(path, *, new_dir, nth, total=None, old_dir=None):
         """
         d1=None mean it's a new file in d2
         """
@@ -267,8 +279,8 @@ def onedir_diff(dir1, dir2, only_git):
                 if not line.endswith('\n'):
                     print()
         else:
-            print(f"!!! WARNING !!! File {file_step} does not exist!", file=sys.stderr)
-            print(f"!!! WARNING !!! output likely broken !!!", file=sys.stderr)
+            warning(f"File {file_step} does not exist!")
+            warning(f"output likely broken !!!")
 
     def heading_details(file, nth, total):
         nth_verbose = f" - {nth}/{total}" if total != 1 else " - "
@@ -282,26 +294,32 @@ def onedir_diff(dir1, dir2, only_git):
 
     # open the possibility to specify an order
     def handle_same_file(file, nth, total):
-        print(f"changes in file: {file}", file=sys.stderr)
+        info(f"changes in file: {file}")
         topic, label = heading_details(file, nth, total)
         if not SCROLLY:
             print(f"<TableOfContentsItem topic='{topic}' label='{label}'>")
-        handle_readme(path2 / file, old_dir=d1, new_dir=d2, nth=nth, total=total)
+        handle_step(path2 / file, old_dir=d1, new_dir=d2, nth=nth, total=total)
         onefile_diff(path1 / file, path2 / file)
         if not SCROLLY:
             print(f"</TableOfContentsItem>")
 
 
     def handle_new_file(file, nth, total):
-        print(f"new file: {file2}", file=sys.stderr)
+        info(f"new file: {file2}")
         topic, label = heading_details(file, nth, total)
 
         if not SCROLLY:
             print(f"<TableOfContentsItem topic='{topic}' label='{label}'>")
-        handle_readme(path2 / file, new_dir=d2, nth=nth, total=total)
+        handle_step(path2 / file, new_dir=d2, nth=nth, total=total)
         onefile_cat(path2 / file2, added=True)
         if not SCROLLY:
             print(f"</TableOfContentsItem>")
+
+    if ONLY_CHANGES_WITH_STEP:
+        same_files = [f for f in same_files if has_step(path2 / f, new_dir=d2)]
+        new_files = [f for f in new_files if has_step(path2 / f, new_dir=d2)]
+        debug(f"same_files (kept only with -step.md): {same_files}")
+        debug(f"new_files (kept only with -step.md): {new_files}")
 
     total_changes = len(same_files) + len(new_files) + len(deleted_files)
 
@@ -314,7 +332,7 @@ def onedir_diff(dir1, dir2, only_git):
         nth += 1
 
     for file1 in deleted_files:
-        print(f"deleted file : {file1}", file=sys.stderr)
+        warning(f"deleted file : {file1}")
         print(f"## {nth}/{total_changes} deleted in {d2}: {file1}")
         nth += 1
 
@@ -324,14 +342,20 @@ def chaindirs(paths, only_git):
     then will run onefile_diff on each pair of successive paths
     """
     for a, b in zip(paths, paths[1:]):
-        print(f"==== comparing {a.name} and {b.name}", file=sys.stderr)
+        info(f"==== comparing {a.name} and {b.name}")
         onedir_diff(a, b, only_git)
 
 # using click to expose one command per function
 
 @click.group(chain=True, help=sys.modules[__name__].__doc__)
-def cli():
-    pass
+@click.option("--debug", is_flag=True, help="enable debug output")
+@click.option("--quiet", is_flag=True, help="enable debug output")
+def cli(debug, quiet):
+    if debug:
+        logging.getLogger().setLevel(logging.DEBUG)
+    if quiet:
+        logging.getLogger().setLevel(logging.WARNING)
+
 
 @cli.command('diff-files', help="write out diff between two files")
 @click.option('-f', '--filename', type=str, help='Filename for the output')
@@ -355,13 +379,16 @@ def onedir_cli(dir1, dir2):
 @cli.command('chain-dirs', help="write out diff between a succession of directories")
 @click.option('-s', '--scrolly', is_flag=True, help='Use scrolly mode')
 @click.option('-a', '--all-files', is_flag=True, help="consider all files, not just the ones under git")
+@click.option('-o', '--only-changes-with-step', is_flag=True, help="only show changes with a step.md file")
 @click.argument('dirs', type=Path, nargs=-1)
-def chaindirs_cli(scrolly, all_files, dirs):
+def chaindirs_cli(scrolly, all_files, only_changes_with_step, dirs):
     if len(dirs) < 2:
-        print("At least two directories are required for comparison.")
+        error("At least two directories are required for comparison.")
         return
     global SCROLLY
     SCROLLY = scrolly
+    global ONLY_CHANGES_WITH_STEP
+    ONLY_CHANGES_WITH_STEP = only_changes_with_step
 
     chaindirs(dirs, only_git=not all_files)
 

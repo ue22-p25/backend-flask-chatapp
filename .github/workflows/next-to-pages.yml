@@ -23,10 +23,10 @@ concurrency:
 
 jobs:
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build-and-deploy:
+    # environment:
+    #   name: github-pages
+    #   url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -45,8 +45,8 @@ jobs:
 
       - name: Build with Next.js
         run: npm run build
-        env:
-          PAGES_BASE_PATH: ${{ steps.deployment.outputs.base_path }}
+        # env:
+        #   PAGES_BASE_PATH: ${{ steps.deployment.outputs.base_path }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

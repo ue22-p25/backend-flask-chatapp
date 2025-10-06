@@ -9,9 +9,8 @@ const nextConfig = {
   // Configure `pageExtensions`` to include MDX files
   pageExtensions: ["js", "jsx", "mdx", "ts", "tsx"],
   // Optionally, add any other Next.js config below
-  // when deploying on GitHub Pages we end up under
-  // https://ue22-p24.github.io/backend-flask-chatapp/
-  basePath: isProd ? "/backend-flask-chatapp" : "",
+  // no longer needed as we now use info-mines.paris
+  // basePath: isProd ? "/backend-flask-chatapp" : "",
 }
 
 /** @type {import('codehike/mdx').CodeHikeConfig} */

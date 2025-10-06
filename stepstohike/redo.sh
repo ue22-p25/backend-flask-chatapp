@@ -6,7 +6,7 @@ ROOT=$(dirname $BIN)
 APP=${ROOT}/app
 
 # where to get the steps
-STEPS_REPO=git@github.com:ue22-p24/backend-flask-chatapp-steps.git
+STEPS_REPO=git@github.com:ue22-p25/backend-flask-chatapp-steps.git
 # where we graft it here
 STEPS=${BIN}/steps-repo
 

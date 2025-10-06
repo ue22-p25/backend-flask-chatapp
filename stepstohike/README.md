@@ -97,7 +97,7 @@ redo.sh all
 ```
 
 will
-- clone the upstream repo `ue22-p24/flask-chatapp-steps` under `stepstohike/steps-repo`
+- clone the upstream repo `ue22-p25/flask-chatapp-steps` under `stepstohike/steps-repo`
 - run the `tofolders` command above to explode this repo into a folder
 - invoke `stepstohike.py` to produce the codehike input
 - run `fillauto.py` to fill the .j2 templates and produce the final `.mdx` input to codehike

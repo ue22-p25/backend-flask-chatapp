@@ -1,11 +1,21 @@
 import Link from 'next/link'
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+
+<div className="container mx-auto py-10">
+
 # A Chat App in Flask - step by step
 
 ## Purpose
 
 This repo describes how to build **a chat app with Flask**, from scratch, and
-step by step.  
+step by step.
 Each step outlines a specific feature, and how to implement it.
 
 It's probably best not to try and implement the code yourself, since that would
@@ -18,14 +28,52 @@ works.
 there are 2 layouts available for the material in this activity; depending on
 your preference, you can choose either one:
 
-- <Link href="/scrollycoding">dual-column scrolly-coding</Link> (preferred)
-  you'll get comments on the left hand side and code changes on the right hand side
+  {/* 1. The Grid Container */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-- <Link href="/singlecolumn">traditional single-column layout</Link>
-  a more usual, single column layout;
-  for each step you get a presentation first, and then the code changes
+    {/* Card 1 */}
+    <Link href="/scrollycoding" className="group no-underline text-inherit">
+      <Card className="h-full transition-all group-hover:shadow-md
+          border-4
+          bg-zinc-800
+          border-zinc-600
+          hover:bg-zinc-600/50
+          hover:border-red-600
+          transition-colors
+      ">
+        <CardHeader>
+          <CardTitle className="no-underline text-zinc-100 text-xl">Dual-column scrolly-coding (preferred)</CardTitle>
+          <CardDescription className="no-underline text-zinc-400">
+            You'll get comments on the left hand side and code changes on the right hand side.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    </Link>
+
+    {/* Card 2 */}
+    <Link href="/singlecolumn" className="group no-underline text-inherit">
+      <Card className="h-full transition-all group-hover:shadow-md
+          border-4
+          bg-zinc-800
+          border-zinc-600
+          hover:bg-zinc-600/50
+          hover:border-red-600
+          transition-colors
+      ">
+        <CardHeader>
+          <CardTitle className="no-underline text-zinc-100 text-xl">Single-column layout (more traditional)</CardTitle>
+          <CardDescription className="no-underline text-zinc-400">
+            For each step you get a presentation first, and later on the code changes
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    </Link>
+
+  </div>
 
 ## Implementation
 
 Just so you know, this material is put together using `Next.js`, and the
 code snippets are rendered using `codehike`.
+
+</div>

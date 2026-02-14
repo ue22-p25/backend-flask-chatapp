@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import Image from "next/image"
 
+import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardContent,
@@ -7,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
 
 <div className="container mx-auto py-10">
 
@@ -19,8 +22,8 @@ step by step.
 Each step outlines a specific feature, and how to implement it.
 
 It's probably best not to try and implement the code yourself, since that would
-drain your bandwidth, and in any case the final code is available in the repo;
-instead, you can read through the code and comments, and figure out how it
+drain your bandwidth, and in any case the final code is available in the repo below;
+instead, you can read through the code and comments, and try to figure out how it
 works.
 
 ## Layouts
@@ -73,7 +76,48 @@ your preference, you can choose either one:
 
 ## Implementation
 
-Just so you know, this material is put together using `Next.js`, and the
-code snippets are rendered using `codehike`.
+<a
+  href="https://github.com/ue22-p25/backend-flask-chatapp-steps"
+  target="_blank"
+  className="hover:opacity-80 transition-opacity mr-4"
+>
+  <Badge variant="outline" className="
+    shrink-0
+    gap-3 px-8 py-0
+    border-zinc-700
+    bg-zinc-900
+    border-2
+    hover:border-red-600
+    text-zinc-300 text-xl
+  ">
+    <Image src="/github.svg" alt=""
+      width={32} height={32}
+      className="invert" />
+    The final code (all steps)
+  </Badge>
+</a>
+<a
+  href="https://github.com/ue22-p25/backend-flask-chatapp"
+  target="_blank"
+  className="hover:opacity-80 transition-opacity"
+>
+  <Badge variant="outline" className="
+    shrink-0
+    gap-1.5 py-1 px-5
+    border-zinc-700
+    bg-zinc-900
+    border-2
+    hover:border-red-600
+    text-zinc-300 text-l
+">
+    <Image src="/github.svg" alt=""
+     width={24} height={24}
+      className="invert" />
+    This book
+  </Badge>
+</a>
+
+This book is made using <a href="https://nextjs.org/">`Next.js`</a>, the
+code snippets are rendered using <a href="https://codehike.org/">`codehike`</a>.
 
 </div>

@@ -17,6 +17,7 @@
     "@mui/lab": "^9.0.0-beta.2",
     "@next/mdx": "16.2.3",
     "@radix-ui/react-slot": "^1.2.4",
+    "@tailwindcss/postcss": "^4.2.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "codehike": "^1.1.0",
